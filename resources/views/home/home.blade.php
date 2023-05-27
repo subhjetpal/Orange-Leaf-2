@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('home.dashboard')
 
 @section('content')
 <main id="main" class="main">
@@ -94,5 +94,13 @@
     </section>
 
   </main>
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script>
+    $(function() {
+      $(document).ready(function() {
+        var width = $( overview ).width();
+        $('iframe').css('height', width / 1.33 );
+      });
+    });
+  </script>
 @endsection

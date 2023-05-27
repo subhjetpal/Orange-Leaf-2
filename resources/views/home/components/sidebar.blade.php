@@ -1,45 +1,51 @@
+<?php
+use App\Http\Controllers\HomeController;
+// if(Session::has('user')){
+//   $total=HomeController::testBladeFunc();
+// }
+?>
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'home.php')===TRUE){ echo 'active';} ?>" href="home.php">
+        <a class="nav-link {{request()->path()=='home'?'active':''}}" href="{{ url('/home') }}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
       </li>
       <!-- End Dashboard Nav -->
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'performance.php')===TRUE){ echo 'active';} ?>" href="performance.php">
+        <a class="nav-link {{request()->path()=='performance'?'active':''}}" href="{{ url('/performance') }}">
           <i class="bi bi-graph-up"></i>
           <span>Performance</span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'add-entry.php')===TRUE){ echo 'active';} ?>" href="add-entry.php">
-          <i class="bx bxs-notepad"></i>
+        <a class="nav-link {{request()->path()=='add-entry'?'active':''}}" href="{{ url('/add-entry') }}">
+          <i class="bx bi-journals"></i>
           <span>Add Entry</span>
         </a>
       </li><!-- End Search Nav -->
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'open-trade.php')===TRUE){ echo 'active';} ?>" href="open-trade.php">
+        <a class="nav-link {{request()->path()=='open-trade'?'active':''}}" href="{{ url('/open-trade') }}">
           <i class="bi bi-eyeglasses"></i>
           <span>Open Trade</span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'trade-journal.php')===TRUE){ echo 'active';} ?>" href="trade-journal.php">
+        <a class="nav-link {{request()->path()=='trade-journal'?'active':''}}" href="{{ url('/trade-journal') }}">
           <i class="bi bi-table"></i>
           <span>Trade Journal</span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'trade-summary.php')===TRUE){ echo 'active';} ?>" href="trade-summary.php">
+        <a class="nav-link {{request()->path()=='trade-summary'?'active':''}}" href="{{ url('/trade-summary') }}">
           <i class="bi bi-table"></i>
           <span>Trade Summary</span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'calculator.php')===TRUE){ echo 'active';} ?>" href="calculator.php">
+        <a class="nav-link {{request()->path()=='calculator'?'active':''}}" href="{{ url('/calculator') }}">
           <i class="bi bi-calculator"></i>
           <span>Calculator</span>
         </a>
@@ -47,14 +53,14 @@
       <!-- <li class="nav-heading">Personal</li>
 
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'profile.php')===TRUE){ echo 'active';} ?>" href="profile.php">
+        <a class="nav-link" href="profile">
           <i class="bi bi-person"></i>
           <span>Profile</span>
         </a>
       </li>
 
       <li class="nav-item">
-        <a class="nav-link <?php if(str_contains($_SERVER['REQUEST_URI'], 'contact.php')===TRUE){ echo 'active';} ?>" href="contact.php">
+        <a class="nav-link" href="contact">
           <i class="bi bi-envelope"></i>
           <span>Contact</span>
         </a>
@@ -62,7 +68,7 @@
 
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="logout.php">
+        <a class="nav-link collapsed" href="{{ url('/logout') }}">
           <i class="bi bi-box-arrow-right"></i>
           <span>Logout</span>
         </a>
