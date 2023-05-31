@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 
 
@@ -25,14 +26,17 @@ class UserController extends Controller
             $req->session()->put('user', $user);
             return redirect('/home');
         } else {
-            $msg="user name or Password not matched";
-            return Redirect::route('/login')->with('alert',$msg);
+            $msg = "user name or Password not matched";
+
+            return view('login')->with('alert' ,$msg);
         }
     }
     function logout(Request $req)
     {
         if ($req->session()->has('user')) {
             session()->flush();
+            $req->session()->put('alert', 'Successfully Logout');
+        
             return redirect('/index');
         } else {
             return redirect('/login');

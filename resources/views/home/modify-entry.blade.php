@@ -19,7 +19,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Modify Entry</h5>
-                            <form action="{{ url('/modify-entry') }}" method="POST" name="quantity_calc" enctype='multipart/form-data'>
+                            <form action="{{ url('/modify-entry') }}" method="POST" name="quantity_calc"
+                                enctype='multipart/form-data'>
                                 @csrf
                                 <div class="col-12">
                                     <div class="row">
@@ -35,19 +36,18 @@
                                             <label for="Order" class="form-label">Order *</label>
                                             <select name="Order" class="form-select" id="Order" required>
                                                 <option value="Select" default>Select</option>
-                                                <option value="{{ $val['Order'] }}" default>{{ $val['Order'] }}</option>
                                                 <!-- <option value="In Process">In Process</option> -->
                                                 <option value="Open"
-                                                    @if ($val['Order'] != 'In Process') {{ 'disabled' }} @endif>Open
+                                                    @if ($val['Order'] != 'In Process' && $TradeID == 'NULL') {{ 'disabled' }} @endif>Open
                                                 </option>
                                                 <option value="Exit"
-                                                    @if ($val['Order'] != 'Open') {{ 'disabled' }} @endif>Exit
+                                                    @if ($val['Order'] != 'Open' && $TradeID == 'NULL') {{ 'disabled' }} @endif>Exit
                                                 </option>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="Date" class="form-label">Date *</label>
-                                            <input type="date" name="Date" value="" class="form-control"
+                                            <input type="date" name="Date" value="@if($TradeID != 'NULL'){{$val['Date']}}@endif" class="form-control"
                                                 id="Date" required>
                                             {{-- <input type="date" name="Date" value="{{ date("Y-m-d", strtotime($val['Date']))}}" class="form-control" id="Date" required> --}}
                                         </div>
@@ -104,14 +104,12 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label for="Target1_2" class="form-label">Taregt 1:2</label>
-                                            <input type="number" name="Target1_2"
-                                                value="@if(!empty($val['Target1_2'])){{$val['Target1_2']}} @endif"
+                                            <input type="number" name="Target1_2" value="{{ $val['Target1_2'] }}"
                                                 class="form-control" id="Target1_2" step=".01">
                                         </div>
                                         <div class="col-md-3">
                                             <label for="Target1_3" class="form-label">Target 1:3</label>
-                                            <input type="number" name="Target1_3"
-                                                value="@if(!empty($val['Target1_3'])) {{$val['Target1_3']}} @endif"
+                                            <input type="number" name="Target1_3" value="{{ $val['Target1_3'] }}"
                                                 class="form-control" id="Target1_3" step=".01">
                                         </div>
                                     </div>
@@ -121,8 +119,7 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <label for="Exit" class="form-label">Exit </label>
-                                            <input type="number" name="Exit"
-                                                value="@if (!empty($val['Exit'])) {{ $val['Exit'] }} @endif"
+                                            <input type="number" name="Exit" value="{{ $val['Exit'] }}"
                                                 class="form-control" id="Exit" step=".01">
                                         </div>
                                         <div class="col-md-3">
@@ -149,6 +146,10 @@
                                             <input type="file" name="fileToUpload" class="form-control"
                                                 id="fileToUpload" required>
                                         </div>
+                                        <div class="col-md-6">
+                                            <input type="hidden" name="TradeID" value="{{ $TradeID }}"
+                                                class="form-control" id="TradeID">
+                                        </div>
                                     </div>
                                 </div>
                                 </br>
@@ -166,6 +167,13 @@
     </main>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
+        @if (Session::has('alert'))
+            $(document).ready(function() {
+                var alertMessage = '{{ Session::get('alert') }}';
+                alert(alertMessage);
+                {{ Session::forget('alert') }}
+            });
+        @endif
         $(function() {
             $(document).ready(function() {
                 $("#Script").prop('readonly', true);
@@ -187,26 +195,28 @@
                 var Risk = (Entry - Stop_Loss) * Quantity;
                 $("#Risk").val(Risk);
             });
-            $("#Order").change(function() {
-                var Order = $(this).val();
-                if (Order == 'Open') {
-                    $("#Exit").prop('readonly', true);
-                    $("#entry_submit").prop('disabled', false);
-                } else if (Order == 'Exit') {
-                    $("#Entry").prop('readonly', true);
-                    $("#Stop_Loss").prop('readonly', true);
-                    $("#Target1_2").prop('readonly', true);
-                    $("#Target1_3").prop('readonly', true);
-                    $("#entry_submit").prop('disabled', false);
-                } else {
-                    $("#Exit").prop('readonly', false);
-                    $("#Entry").prop('readonly', false);
-                    $("#Stop_Loss").prop('readonly', false);
-                    $("#Target1_2").prop('readonly', false);
-                    $("#Target1_3").prop('readonly', false);
-                    $("#entry_submit").prop('disabled', true);
-                }
-            });
+            @if ($TradeID == 'NULL')
+                $("#Order").change(function() {
+                    var Order = $(this).val();
+                    if (Order == 'Open') {
+                        $("#Exit").prop('readonly', true);
+                        $("#entry_submit").prop('disabled', false);
+                    } else if (Order == 'Exit') {
+                        $("#Entry").prop('readonly', true);
+                        $("#Stop_Loss").prop('readonly', true);
+                        $("#Target1_2").prop('readonly', true);
+                        $("#Target1_3").prop('readonly', true);
+                        $("#entry_submit").prop('disabled', false);
+                    } else {
+                        $("#Exit").prop('readonly', false);
+                        $("#Entry").prop('readonly', false);
+                        $("#Stop_Loss").prop('readonly', false);
+                        $("#Target1_2").prop('readonly', false);
+                        $("#Target1_3").prop('readonly', false);
+                        $("#entry_submit").prop('disabled', true);
+                    }
+                });
+            @endif
         });
         // if In Process the Order should Only have option 'Open'
         // for 'Open' select which values can't modify made read only. and disbale which not required

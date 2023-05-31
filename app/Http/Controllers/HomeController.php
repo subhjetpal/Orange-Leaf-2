@@ -77,7 +77,9 @@ class HomeController extends Controller
             $tb->Candle = $req->Candle;
             $tb->Risk = $req->Risk;
             $tb->save();
-        } elseif ($req->Trade == 'Dividend' and $req->Order == 'Exit') {
+
+            $req->session()->put('alert', 'Successfully Recorded In Process');
+        } elseif ($req->Trade == 'Dividend') {
             $Trade =  $req->Trade;
             // $Order =  $req->Order;
             $Date = $req->Date;
@@ -122,19 +124,23 @@ class HomeController extends Controller
             $summary->Profit_Loss = $Profit_Loss;
 
             $summary->save();
+
+            $req->session()->put('alert', 'Successfully Recorded Dividend');
         }
         return redirect('add-entry');
     }
-    function modifyEntryFetch(Request $req, $Order, $TradeID)
+    function modifyEntryFetch(Request $req, $stage, $Order, $TradeID)
     {
-        if ($Order == 'In Process') {
+        // TradeID NULL mean Upgrade, not NULL mean Edited
+        if ($Order == 'In Process' && $stage == "Upgrade") {
 
             $data = TradeJournal::where('Script', $TradeID)
                 ->where('Order', $Order)
                 ->first();
 
             $Entry = $data->Entry;
-        } elseif ($Order == 'Open') {
+            $TradeID = 'NULL';
+        } elseif ($Order == 'Open' && $stage == "Upgrade") {
 
             $data = TradeJournal::where('TradeID', $TradeID)
                 ->where('Order', $Order)
@@ -153,18 +159,36 @@ class HomeController extends Controller
                 })
                 ->first();
             $Entry = $avgEntry->avg_entry;
+            $TradeID = 'NULL';
+        } elseif ($Order == 'Open' && $stage == "Edit") {
+
+            $data = TradeJournal::where('TradeID', $TradeID)
+                ->where('Order', $Order)
+                ->first();
+
+            $Entry = $data->Entry;
+            $TradeID = $data->TradeID;
+        } elseif ($Order == 'Exit' && $stage == "Edit") {
+
+            $data = TradeJournal::where('TradeID', $TradeID)
+                ->where('Order', $Order)
+                ->first();
+
+            $Entry = $data->avg_entry;
+            $TradeID = $data->TradeID;
         } else {
             $data = TradeJournal::where('TradeID', $TradeID)
                 ->where('Order', $Order)
                 ->first();
 
             $Entry = $data->Entry;
+            $TradeID = $data->TradeID;
         }
-        return view('home.modify-entry', ['val' => $data->toArray(), 'Entry' => $Entry]);
+        return view('home.modify-entry', ['val' => $data->toArray(), 'Entry' => $Entry, 'TradeID' => $TradeID]);
     }
     function modifyEntry(Request $req)
     {
-        if ($req->Order == 'Open') {
+        if ($req->Order == 'Open' && $req->TradeID == "NULL") {
 
             $Trade =  strtoupper($req->Trade);
             $Order =  $req->Order;
@@ -190,13 +214,14 @@ class HomeController extends Controller
 
             // Image Upload -----------------------
             $file = $req->file('fileToUpload');
-            $fileName = $file->getClientOriginalName();
+            $fileName = strtotime("now") . '_' . $file->getClientOriginalName();
             $filePath = 'images/' . $fileName;
 
             if (Storage::exists($filePath)) {
+                $req->session()->put('alert', 'Image Already Exixts');
                 return redirect('open-trade');
             } else {
-                $file->storeAs('images', $fileName, 'public');
+                $file->move(public_path('images'), $fileName);
 
                 $entry = TradeJournal::where('Script', $req->Script)
                     ->where('Order', 'In Process')
@@ -212,10 +237,12 @@ class HomeController extends Controller
                         'Quantity' => $Quantity,
                         'Candle' => $Candle,
                         'Risk' => $Risk,
-                        'ImageURL' => $fileName
+                        'ImageURL' => $filePath
                     ]);
+
+                $req->session()->put('alert', 'Successfully Upgraded to Open Order');
             }
-        } elseif ($req->Order == 'Exit') {
+        } elseif ($req->Order == 'Exit' && $req->TradeID == "NULL") {
             $Trade =  $req->Trade;
             $Order =  $req->Order;
             $Date = $req->Date;
@@ -239,12 +266,14 @@ class HomeController extends Controller
 
             // Image Upload -----------------------
             $file = $req->file('fileToUpload');
-            $fileName = $file->getClientOriginalName();
+            $fileName = strtotime("now") . '_' . $file->getClientOriginalName();
             $filePath = 'images/' . $fileName;
 
             if (Storage::exists($filePath)) {
+                $req->session()->put('alert', 'Image Already Exixts');
                 return redirect('open-trade');
             } else {
+                $file->move(public_path('images'), $fileName);
                 $entry = new TradeJournal;
 
                 $entry->UserID = $req->session()->get('user')['UserID'];
@@ -261,7 +290,7 @@ class HomeController extends Controller
                 $entry->Quantity = $Quantity;
                 $entry->Candle = $Candle;
                 $entry->Risk = $Risk;
-                $entry->ImageURL = $fileName;
+                $entry->ImageURL = $filePath;
 
                 $entry->save();
 
@@ -295,6 +324,138 @@ class HomeController extends Controller
                 $summary->Profit_Loss = $Profit_Loss;
 
                 $summary->save();
+
+                $req->session()->put('alert', 'Successfully Upgraded to Exit Order');
+            }
+        } else if ($req->Order == 'Open' && $req->TradeID != "NULL") {
+            $Trade =  strtoupper($req->Trade);
+            $Order =  $req->Order;
+            $Date = $req->Date;
+            // $Chart = $req->Chart;
+            $Script = strtoupper($req->Script);
+            $System = $req->System;
+            $Entry = $req->Entry;
+            $Stop_Loss = $req->Stop_Loss;
+            $Target1_2 = empty($req->Target1_2) ? 0 : $req->Target1_2;
+            $Target1_3 = empty($req->Target1_3) ? 0 : $req->Target1_3;
+            // $Exit = $req->Exit;
+            $Quantity = $req->Quantity;
+            $Candle = $req->Candle;
+            $Risk = $req->Risk;
+
+            // date format to 10MAR2022
+            $DateToText = date('d', strtotime($Date)) . strtoupper(date('M', strtotime($Date))) . date('Y', strtotime($Date));
+
+            // $TradeID = $Script . '_' . $DateToText . '_' . strtoupper($Order);
+
+            $TradeID = strtoupper($req->Script) . '_' . $DateToText . '_' . strtoupper($req->Trade) . '_' . 'ENTRY';
+
+            // Image Upload -----------------------
+            $file = $req->file('fileToUpload');
+            $fileName = strtotime("now") . '_' . $file->getClientOriginalName();
+            $filePath = 'images/' . $fileName;
+
+            if (Storage::exists($filePath)) {
+                $req->session()->put('alert', 'Image Already Exixts');
+                return redirect('open-trade');
+            } else {
+                $file->move(public_path('images'), $fileName);
+
+                $entry = TradeJournal::where('Script', $Script)
+                    ->where('TradeID', $req->TradeID)
+                    ->update([
+                        'TradeID' => $TradeID,
+                        'Order' => $Order,
+                        'Date' => $Date,
+                        'System' => $System,
+                        'Entry' => $Entry,
+                        'Stop_Loss' => $Stop_Loss,
+                        'Target1_2' => $Target1_2,
+                        'Target1_3' => $Target1_3,
+                        'Quantity' => $Quantity,
+                        'Candle' => $Candle,
+                        'Risk' => $Risk,
+                        'ImageURL' => $filePath
+                    ]);
+
+                $req->session()->put('alert', 'Successfully Edited Recorded Open Order');
+            }
+        } elseif ($req->Order == 'Exit' && $req->TradeID != "NULL") {
+            $Trade =  $req->Trade;
+            $Order =  $req->Order;
+            $Date = $req->Date;
+            $Chart = $req->Chart;
+            $Script = strtoupper($req->Script);
+            $System = $req->System;
+            $Entry = $req->Entry;
+            $Stop_Loss = $req->Stop_Loss;
+            // $Target1_2 = empty($req->Target1_2) ? 0 : $req->Target1_2;
+            // $Target1_3 = empty($req->Target1_3) ? 0 : $req->Target1_3;
+            $Exit = $req->Exit;
+            $Quantity = $req->Quantity;
+            $Candle = $req->Candle;
+            $Risk = $req->Risk;
+
+            // date format to 10MAR2022
+            $DateToText = date('d', strtotime($Date)) . strtoupper(date('M', strtotime($Date))) . date('Y', strtotime($Date));
+
+            $TradeID = $Script . '_' . $DateToText . '_' . strtoupper($Trade) . '_' . strtoupper($Order);
+            $TradeID_S = $Script . '_' . $DateToText . '_' . strtoupper($Trade);
+
+            // Image Upload -----------------------
+            $file = $req->file('fileToUpload');
+            $fileName = strtotime("now") . '_' . $file->getClientOriginalName();
+            $filePath = 'images/' . $fileName;
+
+            if (Storage::exists($filePath)) {
+                $req->session()->put('alert', 'Image Already Exixts');
+                return redirect('open-trade');
+            } else {
+                $file->move(public_path('images'), $fileName);
+
+                $entry = TradeJournal::where('Script', $Script)
+                    ->where('TradeID', $req->TradeID)
+                    ->update([
+                        'TradeID' => $TradeID,
+                        'Order' => $Order,
+                        'Date' => $Date,
+                        'System' => $System,
+                        'Entry' => $Entry,
+                        'Exit' => $Exit,
+                        'Quantity' => $Quantity,
+                        'Candle' => $Candle,
+                        'Risk' => $Risk,
+                        'ImageURL' => $filePath
+                    ]);
+
+                $Transact = ($Entry > $Stop_Loss) ? 'Buy' : 'Short';
+
+                if ($Transact == 'Buy') {
+                    $Percent = ($Exit - $Entry) * 100 / $Entry;
+                } else {
+                    $Percent = ($Entry - $Exit) * 100 / $Entry;
+                }
+                $Profit_Loss = (($Transact == 'Buy') ? ($Exit - $Entry) : ($Entry - $Exit)) * $Quantity;
+
+                $reqTradeId_ex=explode('_', $req->TradeID);
+                $reqTradeId_s=trim($reqTradeId_ex[0]).'_'.trim($reqTradeId_ex[1]).'_'.trim($reqTradeId_ex[2]);
+
+                $summary = TradeSummary::where('Script', $req->Script)
+                    ->where('TradeID', $reqTradeId_s)
+                    ->update([
+                        'TradeID' => $TradeID_S,
+                        'Trade' => $Trade,
+                        'Transact' => $Transact,
+                        'Date' => $Date,
+                        'Script' => $Script,
+                        'Entry' => $Entry,
+                        'Exit' => $Exit,
+                        'Quantity' => $Quantity,
+                        'Percent' => $Percent,
+                        'Profit_Loss' => $Profit_Loss
+                    ]);
+
+                $req->session()->put('alert', 'Successfully Edited Recorded Exit Order');
             }
         }
 

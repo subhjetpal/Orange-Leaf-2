@@ -27,13 +27,13 @@
 </head>
 
 <body>
-    @if (request()->path()!='login' || request()->path()!='register')
+    @if (request()->path()!='login' && request()->path()!='register')
         {{ View::make('components.header') }}
     @endif
 
     @yield('content')
 
-    @if (request()->path()!='login' || request()->path()!='register')
+    @if (request()->path()!='login' && request()->path()!='register')
         {{ View::make('components.footer') }}
     @endif
 

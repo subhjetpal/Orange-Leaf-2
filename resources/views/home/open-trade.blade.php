@@ -63,8 +63,9 @@
                       <td>
                         @if ($val['Order'] != 'In Process')
                           <a href="view-trade/{{$val['TradeID']}}" onclick="return confirm('Are You sure Want to View {{$val['Script']}}')"><i class="bi bi-eye-fill"></i></a>
+                          <a href="modify-entry/Edit/{{$val['Order']}}/{{$val['TradeID']}}" class="" onclick="return confirm('Are You sure Want to Edit {{$val['Script']}}')"><i class="bi bi-pencil-square"></i></a>
                         @endif
-                        <a href="modify-entry/{{$val['Order']}}/{{($val['TradeID']!='NULL') ? $val['TradeID'] : $val['Script']}}" class="" onclick="return confirm('Are You sure Want to modify {{$val['Script']}}')"><i class="bi bi-pencil-square"></i></a>
+                        <a href="modify-entry/Upgrade/{{$val['Order']}}/{{($val['TradeID']!='NULL') ? $val['TradeID'] : $val['Script']}}/" class="" onclick="return confirm('Are You sure Want to Upgrade {{$val['Script']}}')"><i class="bi bi-arrow-up-square"></i></a>
                         @if ($val['Order']== 'In Process')
                           <a href="delete-entry.php/{{$val['Script']}}" onclick="return confirm('Are You sure Want to Delete {{$val['Script']}}')"><i class="bi bi-trash"></i></a>
                         @endif

@@ -79,7 +79,7 @@
                             <div class="tab-content pt-2">
                                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
                                     <div class="row">
-                                        <img style="width: 900px;height: 478px;overflow: hidden; float: left;display:inline-block;vertical-align:middle;" src="images/{{ $val['ImageURL']}}" alt="profile" onerror="this.src='images/profile.png';">
+                                        <img style="width: 900px;height: 478px;overflow: hidden; float: left;display:inline-block;vertical-align:middle;" src="{{ asset($val['ImageURL'])}}" alt="profile" onerror="this.src='{{ asset('images/profile.png')}}';">
                                     </div>
                                 </div>
                             </div><!-- End Bordered Tabs -->

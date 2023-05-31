@@ -86,6 +86,7 @@
                       <td>{{$val['Risk']}}</td>
                       <td>
                         <a href="view-trade/{{$val['TradeID']}}" onclick="return confirm('Are You sure Want to View {{$val['Script']}}')"><i class="bi bi-eye-fill"></i></a>
+                        <a href="modify-entry/Edit/{{$val['Order']}}/{{$val['TradeID']}}" class="" onclick="return confirm('Are You sure Want to modify {{$val['Script']}}')"><i class="bi bi-pencil-square"></i></a>
                       </td>
                       <!-- Script Link for Chart View -->
 

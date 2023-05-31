@@ -28,7 +28,7 @@ Route::get('/index', function () {
 
 Route::get('/login', function () {
     return view('login');
-});
+})->name('login');
 
 Route::post('/login', [UserController::class, 'login']);
 
@@ -73,7 +73,7 @@ Route::get('/emi-calculator', function () {
     return view('home.emi-calculator');
 });
 
-Route::get('/modify-entry/{Order}/{TradeID}', [HomeController::class, 'modifyEntryFetch']);
+Route::get('/modify-entry/{Stage}/{Order}/{TradeID}', [HomeController::class, 'modifyEntryFetch']);
 
 Route::post('/modify-entry', [HomeController::class, 'modifyEntry']);
 

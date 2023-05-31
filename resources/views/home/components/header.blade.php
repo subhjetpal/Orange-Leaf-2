@@ -7,28 +7,28 @@ use App\Http\Controllers\HomeController;
 <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="home" class="logo d-flex align-items-center">
-        <!-- <span class="d-none d-lg-block">Orange Leaf</span> -->
-        <img src="{{ asset('img/orange_leaf_mid.png')}}"  alt="Orange Leaf">
-        <!-- <span class="d-none d-lg-block">Orange Leaf</span> -->
-      </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
+        <a href="home" class="logo d-flex align-items-center">
+            <!-- <span class="d-none d-lg-block">Orange Leaf</span> -->
+            <img src="{{ asset('img/orange_leaf_mid.png') }}" alt="Orange Leaf">
+            <!-- <span class="d-none d-lg-block">Orange Leaf</span> -->
+        </a>
+        <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
 
 
     <nav class="header-nav ms-auto">
-      <ul class="d-flex align-items-center">
+        <ul class="d-flex align-items-center">
 
-        <!-- <li class="nav-item d-block d-lg-none">
+            <!-- <li class="nav-item d-block d-lg-none">
           <a class="nav-link nav-icon search-bar-toggle " href="#">
             <i class="bi bi-search"></i>
           </a>
         </li> -->
-        <!-- End Search Icon-->
+            <!-- End Search Icon-->
 
-        <li class="nav-item dropdown">
+            <li class="nav-item dropdown">
 
-          <!-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+                <!-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">
               You have 4 new notifications
               <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
@@ -93,13 +93,13 @@ use App\Http\Controllers\HomeController;
             </li>
 
           </ul> -->
-          <!-- End Notification Dropdown Items -->
+                <!-- End Notification Dropdown Items -->
 
-        </li><!-- End Notification Nav -->
+            </li><!-- End Notification Nav -->
 
-        <li class="nav-item dropdown">
+            <li class="nav-item dropdown">
 
-          <!-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+                <!-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
             <li class="dropdown-header">
               You have 3 new messages
               <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
@@ -155,19 +155,23 @@ use App\Http\Controllers\HomeController;
             </li>
 
           </ul> -->
-          <!-- End Messages Dropdown Items -->
+                <!-- End Messages Dropdown Items -->
 
-        </li>
-        <!-- End Messages Nav -->
+            </li>
+            <!-- End Messages Nav -->
 
-        <li class="nav-item dropdown pe-3">
+            <li class="nav-item dropdown pe-3">
 
-          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-             <span class="d-none d-md-block dropdown-toggle ps-2"><?php //if(!empty($_SESSION['username'])){ echo $_SESSION['username']; } ?></span>
-          </a><!-- End Profile Iamge Icon -->
+                <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <span class="d-none d-md-block dropdown-toggle ps-2">
+                        @if (Session::has('user'))
+                            {{ Session::get('user.Username') }}
+                        @endif
+                    </span>
+                </a><!-- End Profile Iamge Icon -->
 
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-            <!-- <li>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                    <!-- <li>
               <hr class="dropdown-divider">
             </li>
 
@@ -191,17 +195,17 @@ use App\Http\Controllers\HomeController;
               <hr class="dropdown-divider">
             </li> -->
 
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="logout.php">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Sign Out</span>
-              </a>
-            </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="{{ url('/logout') }}">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </li>
 
-          </ul><!-- End Profile Dropdown Items -->
-        </li><!-- End Profile Nav -->
+                </ul><!-- End Profile Dropdown Items -->
+            </li><!-- End Profile Nav -->
 
-      </ul>
+        </ul>
     </nav><!-- End Icons Navigation -->
 
-  </header>
+</header>

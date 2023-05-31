@@ -37,8 +37,8 @@
                                             <label for="Order" class="form-label">Order *</label>
                                             <select name="Order" class="form-select" id="Order" required>
                                                 <option value="" default>Select</option>
-                                                <option value="In Process">In Process</option>
-                                                <option value="Open">Open</option>
+                                                <option value="In Process" id="In_Process">In Process</option>
+                                                <option value="Open" id="Open">Open</option>
                                                 <option value="Exit">Exit</option>
                                             </select>
                                         </div>
@@ -148,6 +148,13 @@
     </main>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
+        @if (Session::has('alert'))
+            $(document).ready(function() {
+                var alertMessage = '{{ Session::get('alert') }}';
+                alert(alertMessage);
+                {{ Session::forget('alert') }}
+            });
+        @endif
         // calculate Candle % on Entry and Stoploss value entry
         $(function() {
             $(".candle").change(function() {
@@ -178,9 +185,17 @@
             });
             $("#Trade").change(function() {
                 var Trade = $(this).val();
-                if (Trade != 'Swing') {
+                if (Trade == 'Positional') {
+                    $("#In_Process").prop('disabled', false);
+                    $("#Open").prop('disabled', false);
+                    $("#Order").prop('disabled', false);
+                    $("#System").prop('disabled', false);
+                    $("#Entry").prop('readonly', false);
+                    $("#Chart").prop('disabled', false);
+                    $("#Stop_Loss").prop('readonly', false);
                     $("#Target1_2").prop('readonly', true);
                     $("#Target1_3").prop('readonly', true);
+                    $("#Risk").prop('disabled', false);
                 } else if (Trade == 'Dividend') {
                     $("#Order").prop('disabled', true);
                     $("#System").prop('disabled', true);
@@ -191,6 +206,8 @@
                     $("#Target1_3").prop('readonly', true);
                     $("#Risk").prop('disabled', true);
                 } else {
+                    // $("#In_Process").prop('disabled', false);
+                    // $("#Open").prop('disabled', false);
                     $("#Order").prop('disabled', false);
                     $("#System").prop('disabled', false);
                     $("#Entry").prop('readonly', false);
@@ -202,6 +219,5 @@
                 }
             });
         });
-        // for In process one of target should have value
     </script>
 @endsection
