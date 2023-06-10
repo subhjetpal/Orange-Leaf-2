@@ -16,12 +16,12 @@ class UserSeeder extends Seeder
     {
         DB::table('users')->insert(
         [
-            'UserID'=>'jeet6662',
-            'Name'=>'Subhajeet Paul',
-            'User_Type'=>'Admin',
+            'UserID'=>'',
+            'Name'=>'',
+            'User_Type'=>'',
             'Email'=>'',
             'Username'=>'root',
-            'Password'=>Hash::make('root'),
+            'Password'=>Hash::make(''),
             'ImageURl'=>''
         ]
     );

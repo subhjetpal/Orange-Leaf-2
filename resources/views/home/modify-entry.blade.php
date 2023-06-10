@@ -35,20 +35,23 @@
                                         <div class="col-md-4">
                                             <label for="Order" class="form-label">Order *</label>
                                             <select name="Order" class="form-select" id="Order" required>
-                                                <option value="Select" default>Select</option>
+                                                <option value="{{ $val['Order'] }}" default>{{ $val['Order'] }}</option>
                                                 <!-- <option value="In Process">In Process</option> -->
-                                                <option value="Open"
-                                                    @if ($val['Order'] != 'In Process' && $TradeID == 'NULL') {{ 'disabled' }} @endif>Open
-                                                </option>
-                                                <option value="Exit"
-                                                    @if ($val['Order'] != 'Open' && $TradeID == 'NULL') {{ 'disabled' }} @endif>Exit
-                                                </option>
+                                                @if ($TradeID == 'NULL')
+                                                    <option value="Open"
+                                                        @if ($val['Order'] != 'In Process') {{ 'disabled' }} @endif>Open
+                                                    </option>
+                                                    <option value="Exit"
+                                                        @if ($val['Order'] != 'Open') {{ 'disabled' }} @endif>Exit
+                                                    </option>
+                                                @endif
                                             </select>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="Date" class="form-label">Date *</label>
-                                            <input type="date" name="Date" value="@if($TradeID != 'NULL'){{$val['Date']}}@endif" class="form-control"
-                                                id="Date" required>
+                                            <input type="date" name="Date"
+                                                value="@if ($TradeID != 'NULL') {{ $val['Date'] }} @endif"
+                                                class="form-control" id="Date" required>
                                             {{-- <input type="date" name="Date" value="{{ date("Y-m-d", strtotime($val['Date']))}}" class="form-control" id="Date" required> --}}
                                         </div>
 
@@ -167,18 +170,52 @@
     </main>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
-        @if (Session::has('alert'))
-            $(document).ready(function() {
-                var alertMessage = '{{ Session::get('alert') }}';
-                alert(alertMessage);
-                {{ Session::forget('alert') }}
-            });
-        @endif
         $(function() {
             $(document).ready(function() {
                 $("#Script").prop('readonly', true);
-                $("#entry_submit").prop('disabled', true);
+                var Order = $("#Order").val();
+                if (Order == 'Open') {
+                    $("#Exit").prop('readonly', true);
+                } else if (Order == 'Exit') {
+                    $("#Entry").prop('readonly', true);
+                    $("#Stop_Loss").prop('readonly', true);
+                    $("#Target1_2").prop('readonly', true);
+                    $("#Target1_3").prop('readonly', true);
+                } else {
+                    $("#Exit").prop('readonly', false);
+                    $("#Entry").prop('readonly', false);
+                    $("#Stop_Loss").prop('readonly', false);
+                    $("#Target1_2").prop('readonly', false);
+                    $("#Target1_3").prop('readonly', false);
+                }
             });
+            @if ($TradeID == 'NULL')
+                $(document).ready(function() {
+                    $("#entry_submit").prop('disabled', true);
+                });
+                $("#Order").change(function() {
+                    var Order = $(this).val();
+                    if (Order == 'Open') {
+                        $("#Exit").prop('readonly', true);
+                        $("#entry_submit").prop('disabled', false);
+                    } else if (Order == 'Exit') {
+                        $("#Exit").prop('readonly', false);
+                        $("#Entry").prop('readonly', true);
+                        $("#Stop_Loss").prop('readonly', true);
+                        $("#Target1_2").prop('readonly', true);
+                        $("#Target1_3").prop('readonly', true);
+                        $("#entry_submit").prop('disabled', false);
+                    } else {
+                        $("#Exit").prop('readonly', false);
+                        $("#Entry").prop('readonly', false);
+                        $("#Stop_Loss").prop('readonly', false);
+                        $("#Target1_2").prop('readonly', false);
+                        $("#Target1_3").prop('readonly', false);
+                        $("#entry_submit").prop('disabled', true);
+                    }
+                });
+            @endif
+
             $(".candle").change(function() {
                 var Entry = $("#Entry").val();
                 var Stop_Loss = $("#Stop_Loss").val();
@@ -195,28 +232,7 @@
                 var Risk = (Entry - Stop_Loss) * Quantity;
                 $("#Risk").val(Risk);
             });
-            @if ($TradeID == 'NULL')
-                $("#Order").change(function() {
-                    var Order = $(this).val();
-                    if (Order == 'Open') {
-                        $("#Exit").prop('readonly', true);
-                        $("#entry_submit").prop('disabled', false);
-                    } else if (Order == 'Exit') {
-                        $("#Entry").prop('readonly', true);
-                        $("#Stop_Loss").prop('readonly', true);
-                        $("#Target1_2").prop('readonly', true);
-                        $("#Target1_3").prop('readonly', true);
-                        $("#entry_submit").prop('disabled', false);
-                    } else {
-                        $("#Exit").prop('readonly', false);
-                        $("#Entry").prop('readonly', false);
-                        $("#Stop_Loss").prop('readonly', false);
-                        $("#Target1_2").prop('readonly', false);
-                        $("#Target1_3").prop('readonly', false);
-                        $("#entry_submit").prop('disabled', true);
-                    }
-                });
-            @endif
+
         });
         // if In Process the Order should Only have option 'Open'
         // for 'Open' select which values can't modify made read only. and disbale which not required

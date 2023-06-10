@@ -1,21 +1,21 @@
 @extends('home.dashboard')
 
 @section('content')
-<main id="main" class="main">
+    <main id="main" class="main">
 
-    <div class="pagetitle">
-        <h1>Trade Summary</h1>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="home">Home</a></li>
-                <!--<li class="breadcrumb-item">Search</li> -->
-                <li class="breadcrumb-item "><a href="trade-summary" class="active">Trade Summary</a></li>
-            </ol>
-        </nav>
-    </div><!-- End Page Title -->
-    <section class="section">
-        <div class="row">
-            {{-- <form action="" method="POST" name="date_select" class="date">
+        <div class="pagetitle">
+            <h1>Trade Summary</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="home">Home</a></li>
+                    <!--<li class="breadcrumb-item">Search</li> -->
+                    <li class="breadcrumb-item "><a href="trade-summary" class="active">Trade Summary</a></li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+        <section class="section">
+            <div class="row">
+                {{-- <form action="" method="POST" name="date_select" class="date">
                 <div class="col-lg-12">
                     <div class="row">
                         <div class="col-7"></div>
@@ -35,72 +35,72 @@
                     </div>
                 </div>
             </form> --}}
-        </div>
-    </section>
-    </br>
-    <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
-
-                <div class="card">
-                    <div class="card-body">
-                        <table class="table datatable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Trade</th>
-                                    <th scope="col">Transact</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Script</th>
-                                    <th scope="col">Entry</th>
-                                    <th scope="col">Exit</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col">Percent</th>
-                                    <th scope="col">Profit_Loss</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- render tr -->
-                                @foreach ($trade as $val)
-                                    <tr>
-                                        <td>{{ $val['Trade']}}</td>
-                                        <td>{{ $val['Transact']}}</td>
-                                        <td>{{ $val['Date']}}</td>
-                                        <td>{{ $val['Script']}}</td>
-                                        <td>{{ $val['Entry']}}</td>
-                                        <td>{{ $val['Exit']}}</td>
-                                        <td>{{ $val['Quantity']}}</td>
-                                        <td>{{ $val['Percent']}}</td>
-                                        <td>{{ $val['Profit_Loss']}}</td>
-                                        <!-- Script Link for Chart View -->
-
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        <!-- End Table with stripped rows -->
-
-                    </div>
-                </div>
-
             </div>
-        </div>
-    </section>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script>
-        // start date should not be more than end date; end date today so start date tomorrow
-        $(function() {
-            $(".form-date").change(function() {
-                var EndDate = $("#EndDate").val();
-                var StartDate = $("#StartDate").val();
-                if (EndDate < StartDate) {
-                    $("#EndDateValid").show();
-                    $("#DateSelect").prop('disabled', true);
-                } else {
-                    $("#EndDateValid").hide();
-                    $("#DateSelect").prop('disabled', false);
-                }
+        </section>
+        </br>
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table datatable" id="TradeTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Trade</th>
+                                        <th scope="col">Transact</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Script</th>
+                                        <th scope="col">Entry</th>
+                                        <th scope="col">Exit</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Percent</th>
+                                        <th scope="col">Profit_Loss</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- render tr -->
+                                    @foreach ($trade as $val)
+                                        <tr>
+                                            <td>{{ $val['Trade'] }}</td>
+                                            <td>{{ $val['Transact'] }}</td>
+                                            <td>{{ $val['Date'] }}</td>
+                                            <td>{{ $val['Script'] }}</td>
+                                            <td>{{ $val['Entry'] }}</td>
+                                            <td>{{ $val['Exit'] }}</td>
+                                            <td>{{ $val['Quantity'] }}</td>
+                                            <td>{{ $val['Percent'] }}</td>
+                                            <td>{{ $val['Profit_Loss'] }}</td>
+                                            <!-- Script Link for Chart View -->
+
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <!-- End Table with stripped rows -->
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+        <script>
+            // start date should not be more than end date; end date today so start date tomorrow
+            $(function() {
+                $(".form-date").change(function() {
+                    var EndDate = $("#EndDate").val();
+                    var StartDate = $("#StartDate").val();
+                    if (EndDate < StartDate) {
+                        $("#EndDateValid").show();
+                        $("#DateSelect").prop('disabled', true);
+                    } else {
+                        $("#EndDateValid").hide();
+                        $("#DateSelect").prop('disabled', false);
+                    }
+                });
             });
-        });
-    </script>
-</main>
+        </script>
+    </main>
 @endsection

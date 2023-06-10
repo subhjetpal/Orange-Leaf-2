@@ -241,6 +241,7 @@ class HomeController extends Controller
                     ]);
 
                 $req->session()->put('alert', 'Successfully Upgraded to Open Order');
+                return redirect('open-trade');
             }
         } elseif ($req->Order == 'Exit' && $req->TradeID == "NULL") {
             $Trade =  $req->Trade;
@@ -262,7 +263,7 @@ class HomeController extends Controller
             $DateToText = date('d', strtotime($Date)) . strtoupper(date('M', strtotime($Date))) . date('Y', strtotime($Date));
 
             $TradeID = $Script . '_' . $DateToText . '_' . strtoupper($Trade) . '_' . strtoupper($Order);
-            $TradeID_S = $Script . '_' . $DateToText . '_' . strtoupper($Trade);
+            // $TradeID_S = $Script . '_' . $DateToText . '_' . strtoupper($Trade);
 
             // Image Upload -----------------------
             $file = $req->file('fileToUpload');
@@ -312,7 +313,7 @@ class HomeController extends Controller
 
                 $summary->UserID = $req->session()->get('user')['UserID'];
                 $summary->SchemeID = '23EGD8564';
-                $summary->TradeID = $TradeID_S;
+                $summary->TradeID = $TradeID;
                 $summary->Trade = $Trade;
                 $summary->Transact = $Transact;
                 $summary->Date = $Date;
@@ -326,8 +327,9 @@ class HomeController extends Controller
                 $summary->save();
 
                 $req->session()->put('alert', 'Successfully Upgraded to Exit Order');
+                return redirect('open-trade');
             }
-        } else if ($req->Order == 'Open' && $req->TradeID != "NULL") {
+        } elseif ($req->Order == 'Open' && $req->TradeID != "NULL") {
             $Trade =  strtoupper($req->Trade);
             $Order =  $req->Order;
             $Date = $req->Date;
@@ -379,6 +381,7 @@ class HomeController extends Controller
                     ]);
 
                 $req->session()->put('alert', 'Successfully Edited Recorded Open Order');
+                return redirect('open-trade');
             }
         } elseif ($req->Order == 'Exit' && $req->TradeID != "NULL") {
             $Trade =  $req->Trade;
@@ -400,7 +403,7 @@ class HomeController extends Controller
             $DateToText = date('d', strtotime($Date)) . strtoupper(date('M', strtotime($Date))) . date('Y', strtotime($Date));
 
             $TradeID = $Script . '_' . $DateToText . '_' . strtoupper($Trade) . '_' . strtoupper($Order);
-            $TradeID_S = $Script . '_' . $DateToText . '_' . strtoupper($Trade);
+            // $TradeID_S = $Script . '_' . $DateToText . '_' . strtoupper($Trade);
 
             // Image Upload -----------------------
             $file = $req->file('fileToUpload');
@@ -443,7 +446,7 @@ class HomeController extends Controller
                 $summary = TradeSummary::where('Script', $req->Script)
                     ->where('TradeID', $reqTradeId_s)
                     ->update([
-                        'TradeID' => $TradeID_S,
+                        'TradeID' => $TradeID,
                         'Trade' => $Trade,
                         'Transact' => $Transact,
                         'Date' => $Date,
@@ -456,10 +459,9 @@ class HomeController extends Controller
                     ]);
 
                 $req->session()->put('alert', 'Successfully Edited Recorded Exit Order');
+                return redirect('open-trade');
             }
         }
-
-        return redirect('open-trade');
     }
     function tradeJournal(Request $req)
     {
@@ -502,7 +504,7 @@ class HomeController extends Controller
             $delete = TradeJournal::where('TradeID', $TradeID)
                 ->delete();
         } elseif (!empty($Order) && $Order == "ROOT-S") {
-            $delete = TradeSummary::where('IradeID', $TradeID)
+            $delete = TradeSummary::where('TradeID', $TradeID)
                 ->delete();
         }
         return redirect('open-trade');
