@@ -20,15 +20,15 @@
                         <h5 class="card-title">EMI Calculator</h5>
                         <div class="col-12">
                             <label for="loanA" class="form-label">Loan Amount</label>
-                            <input type="number" name="loanA" value="" class="form-control" id="loanA" required>
+                            <input type="number" name="loanA" value="0" class="form-control" id="loanA" required>
                         </div>
                         <div class="col-12">
                             <label for="tenure" class="form-label">Tenure (in Months)</label>
-                            <input type="number" name="tenure" value="" class="form-control" id="tenure" required>
+                            <input type="number" name="tenure" value="12" class="form-control" id="tenure" required>
                         </div>
                         <div class="col-12">
                             <label for="interest" class="form-label">Interest (in Yearly %)</label>
-                            <input type="number" name="interest" value="" class="form-control" id="interest" required>
+                            <input type="number" name="interest" value="12" class="form-control" id="interest" required>
                         </div>
                         <div class="col-12">
                             <label for="NoCost" class="form-label">No Cost EMI</label>
@@ -39,7 +39,7 @@
                         </div>
                         <div class="col-12">
                             <label for="DownPay" class="form-label">Down Payment</label>
-                            <input type="number" name="DownPay" class="form-control" id="DownPay">
+                            <input type="number" name="DownPay" class="form-control" id="DownPay" value="0">
                         </div>
                         <div class="col-12">
                             <label for="EMI" class="form-label">Monthly EMI</label>
@@ -160,10 +160,10 @@
             var options = {
                 series: [{
                     name: 'Principal',
-                    data: Principal
+                    data: Principal.toFixed(2)
                 }, {
                     name: 'Interest',
-                    data: Interst
+                    data: Interst.toFixed(2)
                     // }, {
                     //     name: 'GST',
                     //     data: [35, 41, 36, 26, 45, 48, 52, 53, 41]

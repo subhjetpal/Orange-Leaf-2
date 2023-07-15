@@ -19,30 +19,42 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Add Entry</h5>
-                            <form action="" method="POST" name="entry_form"
-                                onsubmit="return confirm('Are you want to submit')">
+                            <form action="{{ url('/add-entry') }}" method="POST" name="entry_form"
+                                onsubmit="return confirm('Are you want to submit')" enctype="multipart/form-data">
                                 @csrf
                                 <div class="col-12">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label for="Trade" class="form-label">Trade *</label>
                                             <select name="Trade" class="form-select" id="Trade" required>
+                                                <option value="" default>Select</option>
                                                 <option value="Swing">Swing</option>
                                                 <option value="Intraday">Intraday</option>
                                                 <option value="Positional">Positional</option>
                                                 <option value="Dividend">Dividend</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
+                                            <label for="Type" class="form-label">Instrument Type *</label>
+                                            <select name="Type" class="form-select" id="Type" required>
+                                                <option value="Equity" default>Equity</option>
+                                                <option value="Commodity">Commodity</option>
+                                                <option value="Options">Options</option>
+                                                <option value="Futures">Futures</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
                                             <label for="Order" class="form-label">Order *</label>
                                             <select name="Order" class="form-select" id="Order" required>
                                                 <option value="" default>Select</option>
                                                 <option value="In Process" id="In_Process">In Process</option>
                                                 <option value="Open" id="Open">Open</option>
-                                                <option value="Exit">Exit</option>
+                                                <option value="Buy">Buy</option>
+                                                <option value="Short">Short</option>
+                                                <option value="Exit" id="Exit">Exit</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label for="Date" class="form-label">Date</label>
                                             <input type="date" name="Date" value="" class="form-control"
                                                 id="Date">
@@ -50,40 +62,41 @@
 
                                     </div>
                                 </div>
-                                </br>
+                                <br>
                                 <div class="col-12">
                                     <div class="row">
                                         <div class="col-md-4">
                                             <label for="Chart" class="form-label">Chart *</label>
                                             <select name="Chart" class="form-select" id="Chart" required>
                                                 <option value="Daily" default>Daily</option>
+                                                <option value="5 min">5 min</option>
+                                                <option value="15 min">15 min</option>
+                                                <option value="1 Hour">1 Hour</option>
                                                 <option value="Weekly">Weekly</option>
                                                 <option value="Monthly">Monthly</option>
-                                                <option value="1 Hour">1 Hour</option>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="Script" class="form-label">Script *</label>
                                             <input type="name" name="Script" value="" class="form-control"
-                                                id="Script" required>
+                                                id="Script" autocomplete="off" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="System" class="form-label">System *</label>
                                             <select name="System" class="form-select" id="System" required>
                                                 <option value="44 MA" default>44 MA</option>
-                                                <option value="44 MA" default>30 MA</option>
+                                                <option value="30 MA" default>30 MA</option>
                                                 <option value="ABC">ABC</option>
+                                                <option value="ABC4">ABC4</option>
                                                 <option value="ATH">ATH</option>
                                                 <option value="ASIANPAINTS">ASIANPAINTS</option>
                                                 <option value="Triangle Break">Triangle Break</option>
                                                 <option value="Double Bottom">Double Btm</option>
-                                                <option value="Bear Trap">Bear Trap</option>
-                                                <option value="Bull Trap">Bull Trap</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                </br>
+                                <br>
                                 <div class="col-12">
                                     <div class="row">
                                         <div class="col-md-3">
@@ -133,7 +146,21 @@
                                         </div>
                                     </div>
                                 </div>
-                                </br>
+                                <br>
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="fileToUpload" class="form-label">Trade Image</label>
+                                            <input type="file" name="fileToUpload" class="form-control" id="fileToUpload">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="Charges" class="form-label">Charges *</label>
+                                            <input type="number" name="Charges" value="0" step=".01"
+                                                class="form-control" id="Charges">
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary" name="entry_submit"
                                         id="entry_submit">Submit</button>
@@ -196,8 +223,11 @@
                     $("#Target1_2").prop('readonly', true);
                     $("#Target1_3").prop('readonly', true);
                     $("#Risk").prop('disabled', false);
+                    $("#Charges").prop('disabled', true);
+                    $("#fileToUpload").prop('disabled', true);
                 } else if (Trade == 'Dividend') {
                     $("#Order").prop('disabled', true);
+                    $("#Type").prop('disabled', true);
                     $("#System").prop('disabled', true);
                     $("#Entry").prop('readonly', true);
                     $("#Chart").prop('disabled', true);
@@ -205,10 +235,20 @@
                     $("#Target1_2").prop('readonly', true);
                     $("#Target1_3").prop('readonly', true);
                     $("#Risk").prop('disabled', true);
-                } else {
-                    // $("#In_Process").prop('disabled', false);
-                    // $("#Open").prop('disabled', false);
+                    $("#Charges").prop('disabled', true);
+                    $("#fileToUpload").prop('disabled', true);
+                } else if (Trade == 'Intraday') {
+                    $("#fileToUpload").prop('disabled', false);
+                    $("#Charges").prop('disabled', false);
+                    $("#Open").prop('disabled', true);
+                    $("#In_Process").prop('disabled', true);
+                    $("#Exit").prop('disabled', true);
+                }
+                else {
+                    $("#In_Process").prop('disabled', false);
+                    $("#Open").prop('disabled', false);
                     $("#Order").prop('disabled', false);
+                    $("#Type").prop('disabled', false);
                     $("#System").prop('disabled', false);
                     $("#Entry").prop('readonly', false);
                     $("#Chart").prop('disabled', false);
@@ -216,6 +256,11 @@
                     $("#Target1_2").prop('readonly', false);
                     $("#Target1_3").prop('readonly', false);
                     $("#Risk").prop('disabled', false);
+                    $("#Open").prop('disabled', false);
+                    $("#In_Process").prop('disabled', false);
+                    $("#Exit").prop('disabled', false);
+                    $("#Charges").prop('disabled', true);
+                    $("#fileToUpload").prop('disabled', true);
                 }
             });
         });

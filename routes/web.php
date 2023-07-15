@@ -3,19 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\FuncController;
 use Illuminate\Support\Facades\Session;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+
 
 // User
 Route::get('/', function () {
@@ -79,9 +71,25 @@ Route::post('/modify-entry', [HomeController::class, 'modifyEntry']);
 
 Route::get('/trade-journal', [HomeController::class, 'tradeJournal']);
 
+Route::post('/trade-journal', [HomeController::class, 'tradeJournal']);
+
 Route::get('/trade-summary', [HomeController::class, 'tradeSummary']);
 
+Route::post('/trade-summary', [HomeController::class, 'tradeSummary']);
+
 Route::get('/delete-entry/{TradeID}/{Order}', [HomeController::class, 'deleteEntry']);
+
+Route::get('/risk-factor', [HomeController::class, 'riskFactor']);
+
+Route::get('/add-journal', function () {
+    return view('home.add-journal');
+});
+
+Route::get('/template', function () {
+    return view('home.template');
+});
+
+Route::post('/add-journal', [AccountController::class, 'addJournal']);
 
 // Functionality
 

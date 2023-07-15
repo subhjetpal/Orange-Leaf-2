@@ -20,11 +20,11 @@
                         <div class="card-body">
                             <h5 class="card-title">Modify Entry</h5>
                             <form action="{{ url('/modify-entry') }}" method="POST" name="quantity_calc"
-                                enctype='multipart/form-data'>
+                                enctype='multipart/form-data' onsubmit="return confirm('Are you want to submit')">
                                 @csrf
                                 <div class="col-12">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label for="Trade" class="form-label">Trade *</label>
                                             <select name="Trade" class="form-select" id="Trade" required>
                                                 <option value="{{ $val['Trade'] }}" default>{{ $val['Trade'] }}</option>
@@ -32,7 +32,17 @@
                                                 <option value="Positional">Positional</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
+                                            <label for="Type" class="form-label">Instrument Type *</label>
+                                            <select name="Type" class="form-select" id="Type" required>
+                                                <option value="{{ $val['Instrument'] }}" default>{{ $val['Instrument'] }}</option>
+                                                <option value="Equity">Equity</option>
+                                                <option value="Commodity">Commodity</option>
+                                                <option value="Options">Options</option>
+                                                <option value="Futures">Futures</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
                                             <label for="Order" class="form-label">Order *</label>
                                             <select name="Order" class="form-select" id="Order" required>
                                                 <option value="{{ $val['Order'] }}" default>{{ $val['Order'] }}</option>
@@ -47,7 +57,7 @@
                                                 @endif
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label for="Date" class="form-label">Date *</label>
                                             <input type="date" name="Date"
                                                 value="@if ($TradeID != 'NULL') {{ $val['Date'] }} @endif"
@@ -73,21 +83,19 @@
                                         <div class="col-md-4">
                                             <label for="Script" class="form-label">Script *</label>
                                             <input type="name" name="Script" value="{{ $val['Script'] }}"
-                                                class="form-control" id="Script" required>
+                                                class="form-control" id="Script" autocomplete="off" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="System" class="form-label">System *</label>
                                             <select name="System" class="form-select" id="System" required>
                                                 <option value="{{ $val['System'] }}" default>{{ $val['System'] }}</option>
                                                 <option value="44 MA">44 MA</option>
-                                                <option value="44 MA">30 MA</option>
+                                                <option value="30 MA">30 MA</option>
                                                 <option value="ABC">ABC</option>
                                                 <option value="ATH">ATH</option>
                                                 <option value="ASIANPAINTS">ASIANPAINTS</option>
                                                 <option value="Triangle Break">Triangle Break</option>
                                                 <option value="Double Bottom">Double Btm</option>
-                                                <option value="Bear Trap">Bear Trap</option>
-                                                <option value="Bull Trap">Bull Trap</option>
                                             </select>
                                         </div>
                                     </div>
@@ -234,10 +242,5 @@
             });
 
         });
-        // if In Process the Order should Only have option 'Open'
-        // for 'Open' select which values can't modify made read only. and disbale which not required
-
-        // if Open the Order should Only have option 'Exit'
-        // for 'Exit' select which values can't modify made read only. and disbale which not required
-    </script>
+       </script>
 @endsection

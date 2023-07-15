@@ -46,6 +46,13 @@ use App\Http\Controllers\HomeController;
                     <span>Trade Summary</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->path() == 'risk-factor' ? 'active' : '' }}"
+                    href="{{ url('/risk-factor') }}">
+                    <i class="bi bi-table"></i>
+                    <span>Risk Factor</span>
+                </a>
+            </li>
         @endif
         <li class="nav-item">
             <a class="nav-link {{ request()->path() == 'calculator' ? 'active' : '' }}" href="{{ url('/calculator') }}">

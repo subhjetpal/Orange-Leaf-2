@@ -7,7 +7,7 @@ use App\Http\Controllers\HomeController;
 <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-        <a href="home" class="logo d-flex align-items-center">
+        <a href="{{ url('/home') }}" class="logo d-flex align-items-center">
             <!-- <span class="d-none d-lg-block">Orange Leaf</span> -->
             <img src="{{ asset('img/orange_leaf_mid.png') }}" alt="Orange Leaf">
             <!-- <span class="d-none d-lg-block">Orange Leaf</span> -->
@@ -196,7 +196,7 @@ use App\Http\Controllers\HomeController;
             </li> -->
 
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="{{ url('/logout') }}">
+                        <a class="dropdown-item d-flex align-items-center" href="{{ url('/logout') }}" style="color: #F16C51">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Sign Out</span>
                         </a>

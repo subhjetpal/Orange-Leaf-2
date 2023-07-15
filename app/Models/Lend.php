@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Lend extends Model
 {
     use HasFactory;
+    public $table="lends";
     public $timestamps = false;
 
 }
