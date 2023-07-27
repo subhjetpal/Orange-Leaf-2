@@ -74,6 +74,38 @@
         
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="card info-card">
+                        <div class="kpi-body">
+                            <h5 class="kpi-title" style="text-align:center">STT</h5>
+                            <div class="align-items-center" style="text-align:center">
+                                <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                    <div class="">
+                                        <h6 class="kpi-txt">{{ $STT }}</h6>
+                                    </div>
+                                </div>
+        
+                            </div>
+                        </div>
+        
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card info-card">
+                        <div class="kpi-body">
+                            <h5 class="kpi-title" style="text-align:center">Expense</h5>
+                            <div class="align-items-center" style="text-align:center">
+                                <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                    <div class="">
+                                        <h6 class="kpi-txt">{{ $Expense }}</h6>
+                                    </div>
+                                </div>
+        
+                            </div>
+                        </div>
+        
+                    </div>
+                </div>
             </div>
         </section>
         <section class="section">
@@ -82,7 +114,7 @@
 
                     <div class="card">
                         <div class="card-body">
-                            <table class="table" id='datatable'>
+                            <table class="table" id='datatable' width="100%">
                                 <thead>
                                     <tr>
                                         <th scope="col">Trade</th>
@@ -92,6 +124,7 @@
                                         <th scope="col">Entry</th>
                                         <th scope="col">Exit</th>
                                         <th scope="col">Quantity</th>
+                                        <th scope="col">STT</th>
                                         <th scope="col">Percent</th>
                                         <th scope="col">Profit_Loss</th>
                                     </tr>
@@ -107,6 +140,7 @@
                                             <td>{{ $val['Entry'] }}</td>
                                             <td>{{ $val['Exit'] }}</td>
                                             <td>{{ $val['Quantity'] }}</td>
+                                            <td>{{ $val['STT'] }}</td>
                                             <td>{{ $val['Percent'] }}</td>
                                             <td>{{ $val['Profit_Loss'] }}</td>
                                             <!-- Script Link for Chart View -->
@@ -135,16 +169,16 @@
                 scrollX: true,
                 scrollCollapse: true,
                 responsive: true,
-                autoWidth: true,
-                columnDefs: [{
-                    targets: '_all',
-                    width: '25%'
-                }],
+                // columnDefs: [{
+                //     targets: '_all',
+                //     width: calculateColumnWidth(),
+                // }],
                 order: [
                     [2, 'desc']
                 ]
             });
         });
+        
 
         // start date should not be more than end date; end date today so start date tomorrow
         $(function() {

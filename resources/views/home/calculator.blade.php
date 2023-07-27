@@ -32,12 +32,12 @@
                             </div>
                             <div class="col-12">
                                 <label for="step" class="form-label">Step</label>
-                                <input type="number" name="step" value="0.50" class="form-control" id="step"
+                                <input type="number" name="step" value="0" class="form-control" id="step"
                                     required>
                             </div>
                             <div class="col-12">
                                 <label for="entry" class="form-label">Entry</label>
-                                <input type="number" name="entry" value="100" class="form-control" id="entry"
+                                <input type="number" name="entry" value="0" class="form-control" id="entry"
                                     required>
                             </div>
                             <div class="col-12">
@@ -48,7 +48,7 @@
                             <br>
                             <div class="col-12">
                                 <label for="Entry1" class="form-label">Entry</label>
-                                <input type="number" name="Entry1" value="100" class="form-control" id="Entry1" disabled>
+                                <input type="number" name="Entry1" value="" class="form-control" id="Entry1" disabled>
                             </div>
                             <div class="col-12">
                                 <label for="Stoploss1" class="form-label">Stop Loss</label>

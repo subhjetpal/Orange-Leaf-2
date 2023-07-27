@@ -101,8 +101,8 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <label for="Entry" class="form-label">Entry *</label>
-                                            <input type="number" name="Entry" value="" class="form-control candle"
-                                                id="Entry" step=".01" required>
+                                            <input type="number" name="Entry" value=""
+                                                class="form-control candle" id="Entry" step=".01" required>
                                         </div>
                                         <div class="col-md-3">
                                             <label for="Stop_Loss" class="form-label">StopLoss *</label>
@@ -151,13 +151,14 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label for="fileToUpload" class="form-label">Trade Image</label>
-                                            <input type="file" name="fileToUpload" class="form-control" id="fileToUpload">
+                                            <input type="file" name="fileToUpload" class="form-control"
+                                                id="fileToUpload">
                                         </div>
-                                        <div class="col-md-6">
+                                        {{-- <div class="col-md-6">
                                             <label for="Charges" class="form-label">Charges *</label>
                                             <input type="number" name="Charges" value="0" step=".01"
                                                 class="form-control" id="Charges">
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                                 <br>
@@ -184,21 +185,28 @@
         @endif
         // calculate Candle % on Entry and Stoploss value entry
         $(function() {
+            var Percent = 0.00;
             $(".candle").change(function() {
                 var Entry = $("#Entry").val();
                 var Stop_Loss = $("#Stop_Loss").val();
-                var Candle = (Entry - Stop_Loss) * 100 / Entry;
+                var Trade = $("#Trade").val();
+                var Order = $("#Order").val();
+
+                Percent = Order=='Short'?(Stop_Loss - Entry):(Entry - Stop_Loss);
+
+                var Candle = (Percent * 100) / Entry;
                 var Quantity = $("#Quantity").val();
-                var Risk = (Entry - Stop_Loss) * Quantity;
+                var Risk = Percent * Quantity;
                 $("#Candle").val(Candle.toFixed(2));
-                $("#Risk").val(Risk);
+                $("#Risk").val(Risk.toFixed(2));
             });
             $("#Quantity").change(function() {
                 var Entry = $("#Entry").val();
                 var Stop_Loss = $("#Stop_Loss").val();
                 var Quantity = $("#Quantity").val();
-                var Risk = (Entry - Stop_Loss) * Quantity;
-                $("#Risk").val(Risk);
+
+                var Risk = Percent * Quantity;
+                $("#Risk").val(Risk.toFixed(2));
             });
             $("#Order").change(function() {
                 var Order = $(this).val();
@@ -243,8 +251,7 @@
                     $("#Open").prop('disabled', true);
                     $("#In_Process").prop('disabled', true);
                     $("#Exit").prop('disabled', true);
-                }
-                else {
+                } else {
                     $("#In_Process").prop('disabled', false);
                     $("#Open").prop('disabled', false);
                     $("#Order").prop('disabled', false);

@@ -85,11 +85,14 @@ Route::get('/add-journal', function () {
     return view('home.add-journal');
 });
 
-Route::get('/template', function () {
-    return view('home.template');
-});
+// Route::get('/template', function () {
+//     return view('home.template');
+// });
+Route::get('/template', [HomeController::class, 'template']);
 
 Route::post('/add-journal', [AccountController::class, 'addJournal']);
+
+Route::post('/add-comment', [HomeController::class, 'addComment']);
 
 // Functionality
 

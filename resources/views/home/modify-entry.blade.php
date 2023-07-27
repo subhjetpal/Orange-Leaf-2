@@ -60,7 +60,7 @@
                                         <div class="col-md-3">
                                             <label for="Date" class="form-label">Date *</label>
                                             <input type="date" name="Date"
-                                                value="@if ($TradeID != 'NULL') {{ $val['Date'] }} @endif"
+                                                value="@if($TradeID != 'NULL'){{$val['Date']}}@endif"
                                                 class="form-control" id="Date" required>
                                             {{-- <input type="date" name="Date" value="{{ date("Y-m-d", strtotime($val['Date']))}}" class="form-control" id="Date" required> --}}
                                         </div>

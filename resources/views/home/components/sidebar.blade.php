@@ -42,14 +42,14 @@ use App\Http\Controllers\HomeController;
             <li class="nav-item">
                 <a class="nav-link {{ request()->path() == 'trade-summary' ? 'active' : '' }}"
                     href="{{ url('/trade-summary') }}">
-                    <i class="bi bi-table"></i>
+                    <i class="bi bi-file-spreadsheet"></i>
                     <span>Trade Summary</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ request()->path() == 'risk-factor' ? 'active' : '' }}"
                     href="{{ url('/risk-factor') }}">
-                    <i class="bi bi-table"></i>
+                    <i class="bi bi-wallet2"></i>
                     <span>Risk Factor</span>
                 </a>
             </li>
@@ -78,7 +78,7 @@ use App\Http\Controllers\HomeController;
 
         @if (Session::has('user'))
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ url('/logout') }}">
+                <a class="nav-link collapsed" href="{{ url('/logout') }}" onclick="return confirm('Are You sure to Logout')">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Logout</span>
                 </a>

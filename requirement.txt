@@ -1,5 +1,0 @@
-In Login and Register The View header and footer should not show
-\
-Highlight Home Sidebar on Home page
-\
-not access dashboard pags until login --> middleware

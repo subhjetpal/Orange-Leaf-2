@@ -34,15 +34,13 @@
                             @csrf
                             <div class="col-sm-5">
                                 <label for="StartDate" class="form-label">Start Date</label>
-                                <input type="date" name="StartDate"
-                                    value="{{ $StartDate }}"
-                                    class="form-date" id="StartDate">
+                                <input type="date" name="StartDate" value="{{ $StartDate }}" class="form-date"
+                                    id="StartDate">
                             </div>
                             <div class="col-sm-5">
                                 <label for="EndDate" class="form-label">End Date</label>
-                                <input type="date" name="EndDate"
-                                    value="{{ $EndDate }}"
-                                    class="form-date" id="EndDate">
+                                <input type="date" name="EndDate" value="{{ $EndDate }}" class="form-date"
+                                    id="EndDate">
                                 <div class="invalid-feedback" id="EndDateValid" style="font-size: 10px">End Date Can't Less
                                     than Start Date</div>
                             </div>
@@ -83,12 +81,12 @@
                 <div class="col-lg-12">
 
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body" id="table-container">
                             <!-- <h5 class="card-title">Today's Cryptocurrency Prices by Market Cap</h5>
-                                              <p>The global cryptocurrency market cap today is $1.95 Trillion, a 0.2% change in the last 24 hours</p> -->
+                                                      <p>The global cryptocurrency market cap today is $1.95 Trillion, a 0.2% change in the last 24 hours</p> -->
 
                             <!-- Table with stripped rows -->
-                            <table class="table" id="datatable">
+                            <table class="table" id="datatable" width="100%">
                                 <thead>
                                     <tr>
                                         <th scope="col">Trade</th>
@@ -163,16 +161,16 @@
                 scrollX: true,
                 scrollCollapse: true,
                 responsive: true,
-                autoWidth: true,
-                columnDefs: [{
-                    targets: '_all',
-                    width: '25%'
-                }],
+                // columnDefs: [{
+                //     targets: '_all',
+                //     width: calculateColumnWidth(),
+                // }],
                 order: [
                     [2, 'desc']
                 ]
             });
         });
+
 
         // start date should not be more than end date; end date today so start date tomorrow
         $(function() {

@@ -10,6 +10,7 @@ use App\Models\Scheme;
 use App\Models\Sector;
 use App\Models\Lend;
 use App\Models\Expense;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +34,41 @@ class HomeController extends Controller
         $data = TradeJournal::where('trade', $open);
         // $data=TradeJournal::where('trade',$open)->count();
     }
+    function template(Request $req)
+    {
+
+        $Data = TradeJournal::all();
+
+        // Format the data in the required format for ApexCharts
+        $chartData = [];
+        foreach ($Data as $item) {
+            $chartData[] = [
+                'x' => $item->Date, // Replace 'x' with your property for the x-axis data
+                'y' => $item->Entry, // Replace 'y' with your property for the y-axis data
+            ];
+        }
+
+        $jsonData = json_encode($chartData); // to use in Apex Script
+
+        return view('home.template', [
+            'jsonData' => $jsonData,
+        ]);
+    }
+    function addComment(Request $req)
+    {
+        $comment = new Comment;
+
+        $comment->UserID = $req->session()->get('user')['UserID'];
+        $comment->SchemeID = '23TRA7546';
+        $comment->TradeID = $req->TradeID;
+        $comment->CommentID = rand(1000, 9999);
+        $comment->Date = date("ymd");
+        $comment->Comment = $req->comment;
+
+        $comment->save();
+
+        return redirect('open-trade');
+    }
     function riskFactor(Request $req)
     {
 
@@ -52,8 +88,6 @@ class HomeController extends Controller
 
         $turnOver = $summaryCollect->sum('Profit_Loss');
 
-        // $jsonData = json_encode($trade); // to use in Apex Script
-
         $Capital = Scheme::where('SchemeID', '23EGD8564')->first();
         $equityCap = $Capital->Capital * 0.8;
 
@@ -71,7 +105,7 @@ class HomeController extends Controller
         $intraTotalRisk = $intraCap * 0.05;
 
         $riskPossibleEquity = $equityTotalRisk - $InMktRisk;
-        $riskPossibleIntra = $intraTotalRisk - $turnOver;
+        $riskPossibleIntra = $intraTotalRisk + $turnOver;
 
         $tradePossibleEquity = $riskPossibleEquity / $equityRisk;
         $tradePossibleIntra = $riskPossibleIntra / $intraRisk;
@@ -81,14 +115,14 @@ class HomeController extends Controller
             'InMktRisk' => $InMktRisk,
             'equityTotalRisk' => $equityTotalRisk,
             'riskPossibleEquity' => $riskPossibleEquity,
-            'tradePossibleEquity' => $tradePossibleEquity,
+            'tradePossibleEquity' => round($tradePossibleEquity,2),
             // --------------------------------------------
             'intraCap' => $intraCap,
             'turnOver' => $turnOver,
             'intraTotalRisk' => $intraTotalRisk,
             'riskPossibleIntra' => $riskPossibleIntra,
             'riskPossibleIntra' => $riskPossibleIntra,
-            'tradePossibleIntra' => $tradePossibleIntra
+            'tradePossibleIntra' => round($tradePossibleIntra,2)
         ]);
     }
     function openTrade(Request $req)
@@ -102,7 +136,9 @@ class HomeController extends Controller
     {
         if (!empty($TradeID)) {
             $data = TradeJournal::where('TradeID', $TradeID)->first();
-            return view('home.view-trade', ['val' => $data->toArray()]);
+            $comment = Comment::where('TradeID', $TradeID)->first();
+            $Comment = (!empty($comment->Comment)) ? $comment->Comment : "No Comment";
+            return view('home.view-trade', ['val' => $data->toArray(), 'Comment'=>$Comment]);
         } else {
             return redirect('open-trade');
         }
@@ -201,7 +237,7 @@ class HomeController extends Controller
             $Quantity = $req->Quantity;
             $Candle = $req->Candle;
             $Risk = $req->Risk;
-            $Charges = $req->Charges;
+            $Charges = 40;
 
             if ($Type == 'Options') {
                 $STT = (($Order == 'Buy') ? $Exit : $Entry) * $Quantity * 0.000625;
@@ -213,6 +249,10 @@ class HomeController extends Controller
             $DateToText = date('d', strtotime($Date)) . strtoupper(date('M', strtotime($Date))) . date('Y', strtotime($Date));
 
             $TradeID = $Script . '_' . $DateToText . '_' . strtoupper($Trade) . '_' . strtoupper($Order);
+
+            $numRows = TradeJournal::where('TradeID', 'LIKE', $TradeID . '%')
+                ->count();
+            $TradeID = $numRows > 0 ? $TradeID . $numRows + 1 : $TradeID;
             // $TradeID_S = $Script . '_' . $DateToText . '_' . strtoupper($Trade);
 
             // Image Upload -----------------------
@@ -273,12 +313,17 @@ class HomeController extends Controller
                 $summary->Entry = $Entry;
                 $summary->Exit = $Exit;
                 $summary->Quantity = $Quantity;
+                $summary->STT = $STT;
                 $summary->Percent = $Percent;
                 $summary->Profit_Loss = $Profit_Loss;
 
                 $summary->save();
 
-                $ExpenseID = 0;
+                $today_date = date("ymd");
+                $current_time = date("H:i:s");
+                $seconds_value = strtotime("1970-01-01 $current_time UTC");
+                $ExpenseID = $today_date . 'D' . $seconds_value;
+
                 $expense = new Expense;
 
                 $expense->UserID = $req->session()->get('user')['UserID'];
@@ -342,7 +387,7 @@ class HomeController extends Controller
                 ->where('Order', $Order)
                 ->first();
 
-            $Entry = $data->avg_entry;
+            $Entry = $data->Entry;
             $TradeID = $data->TradeID;
         } else {
             $data = TradeJournal::where('TradeID', $TradeID)
@@ -431,7 +476,10 @@ class HomeController extends Controller
             $Candle = $req->Candle;
             $Risk = $req->Risk;
 
-            $STT = $Exit * $Quantity * 0.001;
+            $EntrySTT = $Entry * $Quantity * 0.001;
+            $ExitSTT = $Exit * $Quantity * 0.001;
+
+            $STT = $EntrySTT + $ExitSTT;
 
             // date format to 10MAR2022
             $DateToText = date('d', strtotime($Date)) . strtoupper(date('M', strtotime($Date))) . date('Y', strtotime($Date));
@@ -466,7 +514,7 @@ class HomeController extends Controller
                 $entry->Quantity = $Quantity;
                 $entry->Candle = $Candle;
                 $entry->Risk = $Risk;
-                $entry->STT = $STT;
+                $entry->STT = $ExitSTT;
                 $entry->ImageURL = $filePath;
 
                 $entry->save();
@@ -498,19 +546,42 @@ class HomeController extends Controller
                 $summary->Entry = $Entry;
                 $summary->Exit = $Exit;
                 $summary->Quantity = $Quantity;
+                $summary->STT = $STT;
                 $summary->Percent = $Percent;
                 $summary->Profit_Loss = $Profit_Loss;
 
                 $summary->save();
 
+                $today_date = date("ymd");
+                $seconds_value = date("s");
+                $ExpenseID = $today_date . 'D' . $seconds_value;
+
+                if ($Type == 'Equity') {
+                    $Charges = ($Trade == 'Swing') ? 15.93 : 23.60;
+                } else {
+                    $Charges = 0;
+                }
+
+                $expense = new Expense;
+
+                $expense->UserID = $req->session()->get('user')['UserID'];
+                $expense->SchemeID = '23TRA7546';
+                $expense->ExpenseID = $ExpenseID;
+                $expense->TradeID = $TradeID;
+                $expense->Date = $Date;
+                $expense->Instrument = $Type;
+                $expense->Amount = $Charges;
+
+                $expense->save();
+
                 $req->session()->put('alert', 'Successfully Upgraded to Exit Order');
                 return redirect('open-trade');
             }
-        } elseif ($req->Order == 'Open' && $req->TradeID != "NULL") {
+        } elseif (($req->Order == 'Open' || $req->Order == 'Entry') && $req->TradeID != "NULL") {
             $Trade =  strtoupper($req->Trade);
-            $Order =  $req->Order;
+            // $Order =  $req->Order;
             $Date = $req->Date;
-            // $Chart = $req->Chart;
+            $Chart = $req->Chart;
             $Script = strtoupper($req->Script);
             $System = $req->System;
             $Entry = $req->Entry;
@@ -546,7 +617,7 @@ class HomeController extends Controller
                     ->where('TradeID', $req->TradeID)
                     ->update([
                         'TradeID' => $TradeID,
-                        'Order' => $Order,
+                        // 'Order' => $Order,
                         'Date' => $Date,
                         'System' => $System,
                         'Entry' => $Entry,
@@ -565,7 +636,7 @@ class HomeController extends Controller
             }
         } elseif ($req->Order == 'Exit' && $req->TradeID != "NULL") {
             $Trade =  $req->Trade;
-            $Order =  $req->Order;
+            // $Order =  $req->Order;
             $Date = $req->Date;
             $Chart = $req->Chart;
             $Script = strtoupper($req->Script);
@@ -579,12 +650,15 @@ class HomeController extends Controller
             $Candle = $req->Candle;
             $Risk = $req->Risk;
 
-            $STT = $Exit * $Quantity * 0.001;
+            $EntrySTT = $Entry * $Quantity * 0.001;
+            $ExitSTT = $Exit * $Quantity * 0.001;
+
+            $STT = $EntrySTT + $ExitSTT;
 
             // date format to 10MAR2022
             $DateToText = date('d', strtotime($Date)) . strtoupper(date('M', strtotime($Date))) . date('Y', strtotime($Date));
 
-            $TradeID = $Script . '_' . $DateToText . '_' . strtoupper($Trade) . '_' . strtoupper($Order);
+            $TradeID = $Script . '_' . $DateToText . '_' . strtoupper($Trade) . '_' . 'EXIT';
             // $TradeID_S = $Script . '_' . $DateToText . '_' . strtoupper($Trade);
 
             // Image Upload -----------------------
@@ -602,7 +676,7 @@ class HomeController extends Controller
                     ->where('TradeID', $req->TradeID)
                     ->update([
                         'TradeID' => $TradeID,
-                        'Order' => $Order,
+                        // 'Order' => $Order,
                         'Date' => $Date,
                         'System' => $System,
                         'Entry' => $Entry,
@@ -610,7 +684,7 @@ class HomeController extends Controller
                         'Quantity' => $Quantity,
                         'Candle' => $Candle,
                         'Risk' => $Risk,
-                        'STT' => $STT,
+                        'STT' => $ExitSTT,
                         'ImageURL' => $filePath
                     ]);
 
@@ -623,11 +697,11 @@ class HomeController extends Controller
                 }
                 $Profit_Loss = (($Transact == 'Buy') ? ($Exit - $Entry) : ($Entry - $Exit)) * $Quantity;
 
-                $reqTradeId_ex = explode('_', $req->TradeID);
-                $reqTradeId_s = trim($reqTradeId_ex[0]) . '_' . trim($reqTradeId_ex[1]) . '_' . trim($reqTradeId_ex[2]);
+                // $reqTradeId_ex = explode('_', $req->TradeID);
+                // $reqTradeId_s = trim($reqTradeId_ex[0]) . '_' . trim($reqTradeId_ex[1]) . '_' . trim($reqTradeId_ex[2]);
 
                 $summary = TradeSummary::where('Script', $req->Script)
-                    ->where('TradeID', $reqTradeId_s)
+                    ->where('TradeID', $req->TradeID)
                     ->update([
                         'TradeID' => $TradeID,
                         'Trade' => $Trade,
@@ -637,6 +711,7 @@ class HomeController extends Controller
                         'Entry' => $Entry,
                         'Exit' => $Exit,
                         'Quantity' => $Quantity,
+                        'STT' => $STT,
                         'Percent' => $Percent,
                         'Profit_Loss' => $Profit_Loss
                     ]);
@@ -658,6 +733,9 @@ class HomeController extends Controller
 
         $data = TradeJournal::whereBetween('Date', [$StartDate, $EndDate])->get();
 
+        // $trade = $data->toArray();
+        // $trade_collect = collect($trade);
+
         return view('home.trade-journal', ['trade' => $data->toArray(), 'StartDate' => $StartDate, 'EndDate' => $EndDate]);
     }
     function tradeSummary(Request $req)
@@ -670,16 +748,22 @@ class HomeController extends Controller
         $StartDate = (!empty($req->StartDate)) ? $req->StartDate : $LatestQuarterDate; // quarter
         $EndDate = (!empty($req->EndDate)) ? $req->EndDate : date('Y-m-d'); // today
 
+        $data = Expense::whereBetween('Date', [$StartDate, $EndDate])->get();
+
+        $trade = $data->toArray();
+        $trade_collect = collect($trade);
+
+        $ExpAmount = $trade_collect->sum('Amount');
+
         $data = TradeSummary::whereBetween('Date', [$StartDate, $EndDate])->get();
 
         $trade = $data->toArray();
         $trade_collect = collect($trade);
 
-        // $jsonData = json_encode($trade); // to use in Apex Script
-
         $Profit_Loss = $trade_collect->sum('Profit_Loss');
+        $STT = $trade_collect->sum('STT');
 
-        return view('home.trade-summary', ['trade' => $trade, 'StartDate' => $StartDate, 'EndDate' => $EndDate, 'Profit_Loss' => $Profit_Loss]);
+        return view('home.trade-summary', ['trade' => $trade, 'StartDate' => $StartDate, 'EndDate' => $EndDate, 'Profit_Loss' => $Profit_Loss, 'STT' => $STT, 'Expense' => $ExpAmount]);
     }
     function deleteEntry(Request $req, $TradeID, $Order)
     {

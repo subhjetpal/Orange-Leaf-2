@@ -41,7 +41,7 @@
                                             <div class="input-group has-validation">
                                                 <span class="input-group-text" id="inputGroupPrepend">@</span>
                                                 <input type="text" name="username" class="form-control" id="yourUsername"
-                                                    required>
+                                                    required autocomplete="off">
                                                 <div class="invalid-feedback">Please enter your username.</div>
                                             </div>
                                         </div>
@@ -79,7 +79,7 @@
                             </div>
 
                             <div class="credits" style="color:#a9a9a9">
-                                Designed by <a href="#">Webcodder</a>
+                                Designed by <a href="#" style="color: #F16C51">Webcodder</a>
                             </div>
 
                         </div>
