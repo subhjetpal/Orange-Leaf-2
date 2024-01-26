@@ -2,29 +2,50 @@
 
 @section('content')
     <main id="main" class="main">
-        <div class="pagetitle">
-            <h1>Risk Factor</h1>
-            <nav>
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="home">Home</a></li>
-                    <!--<li class="breadcrumb-item">Search</li> -->
-                    <li class="breadcrumb-item "><a href="risk-factor" class="active">Risk Factor</a></li>
-                </ol>
-            </nav>
-        </div>
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="pagetitle">
+                        <h1>Risk Factor</h1>
+                        <nav>
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="home">Home</a></li>
+                                <!--<li class="breadcrumb-item">Search</li> -->
+                                <li class="breadcrumb-item "><a href="risk-factor" class="active">Risk Factor</a></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+                <div class="col-lg-2"></div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="StartDate" class="form-label">Start Period</label>
+                            <input type="date" name="StartDate" value="{{ $StartDate }}" class="form-date"
+                                id="StartDate" readonly>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="EndDate" class="form-label">End Period</label>
+                            <input type="date" name="EndDate" value="{{ $EndDate }}" class="form-date"
+                                id="EndDate" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
         <div class="col-12">
             <div class="card" style="background-color: transparent; box-shadow: none;">
-                <h5 class="card-title">Intraday</h5>
+                <h5 class="card-title">Positional</h5>
                 <section class="section">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card info-card">
                                 <div class="kpi-body">
-                                    <h5 class="kpi-title" style="text-align:center">Intraday Capital</h5>
+                                    <h5 class="kpi-title" style="text-align:center">Capital</h5>
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $intraCap }}</h6>
+                                                <h6 class="kpi-txt">{{ $positionalCap }}</h6>
                                             </div>
                                         </div>
 
@@ -40,7 +61,221 @@
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $intraTotalRisk }}</h6>
+                                                <h6 class="kpi-txt">{{ $positiionalTotalRisk }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Risk In Market | Turnover</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $InMktRiskPositional }} | {{$turnoverPositional}}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Risk In Cash</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $riskPossiblePositional }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Possible trade</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt"><span style="font-size: 22px">{{ $positionalRisk }} x </span>{{ $tradePossiblePositional }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Equity Expense</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $equityExpense }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card" style="background-color: transparent; box-shadow: none;">
+                <h5 class="card-title">Swing</h5>
+                <section class="section">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Capital</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $swingCap }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Total Risk</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $swingTotalRisk }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Risk In Market | Turnover</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $InMktRiskSwing }} | {{$turnoverSwing}}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Risk In Cash</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $riskPossibleSwing }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Possible trade</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt"><span style="font-size: 22px">{{ $swingRisk }} x </span>{{ $tradePossibleSwing }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Equity Expense</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $equityExpense }}</h6>
+                                            </div>
+                                        </div>
+    
+                                    </div>
+                                </div>
+    
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card" style="background-color: transparent; box-shadow: none;">
+                <h5 class="card-title">Options</h5>
+                <section class="section">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Capital</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $optionsCap }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Total Risk</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $optionsTotalRisk }}</h6>
                                             </div>
                                         </div>
 
@@ -56,7 +291,7 @@
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $turnOver }}</h6>
+                                                <h6 class="kpi-txt">{{ $turnOverOptions }}</h6>
                                             </div>
                                         </div>
 
@@ -74,7 +309,7 @@
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $riskPossibleIntra }}</h6>
+                                                <h6 class="kpi-txt">{{ $riskPossibleOptions }}</h6>
                                             </div>
                                         </div>
 
@@ -90,7 +325,23 @@
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $tradePossibleIntra }}</h6>
+                                                <h6 class="kpi-txt"><span style="font-size: 22px">{{ $optionsRisk }} x </span>{{ $tradePossibleOptions }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Expense</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $optionsExpense }}</h6>
                                             </div>
                                         </div>
 
@@ -102,20 +353,19 @@
                     </div>
                 </section>
             </div>
-        </div>
-        <div class="col-12">
+        </div><div class="col-12">
             <div class="card" style="background-color: transparent; box-shadow: none;">
-                <h5 class="card-title">Equity</h5>
+                <h5 class="card-title">Commodity</h5>
                 <section class="section">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card info-card">
                                 <div class="kpi-body">
-                                    <h5 class="kpi-title" style="text-align:center">Equity Capital</h5>
+                                    <h5 class="kpi-title" style="text-align:center">Capital</h5>
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $equityCap }}</h6>
+                                                <h6 class="kpi-txt">{{ $commodityCap }}</h6>
                                             </div>
                                         </div>
 
@@ -131,7 +381,7 @@
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $equityTotalRisk }}</h6>
+                                                <h6 class="kpi-txt">{{ $commodityTotalRisk }}</h6>
                                             </div>
                                         </div>
 
@@ -143,11 +393,11 @@
                         <div class="col-md-4">
                             <div class="card info-card">
                                 <div class="kpi-body">
-                                    <h5 class="kpi-title" style="text-align:center">Risk In Market</h5>
+                                    <h5 class="kpi-title" style="text-align:center">Turnover</h5>
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $InMktRisk }}</h6>
+                                                <h6 class="kpi-txt">{{ $turnOverCommodity }}</h6>
                                             </div>
                                         </div>
 
@@ -165,7 +415,7 @@
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $riskPossibleEquity }}</h6>
+                                                <h6 class="kpi-txt">{{ $riskPossibleCommodity }}</h6>
                                             </div>
                                         </div>
 
@@ -181,7 +431,23 @@
                                     <div class="align-items-center" style="text-align:center">
                                         <div class="card-icon rounded-circle align-items-center justify-content-center">
                                             <div class="">
-                                                <h6 class="kpi-txt">{{ $tradePossibleEquity }}</h6>
+                                                <h6 class="kpi-txt"><span style="font-size: 22px">{{ $commodityRisk }} x </span>{{ $tradePossibleCommodity }}</h6>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card info-card">
+                                <div class="kpi-body">
+                                    <h5 class="kpi-title" style="text-align:center">Expense</h5>
+                                    <div class="align-items-center" style="text-align:center">
+                                        <div class="card-icon rounded-circle align-items-center justify-content-center">
+                                            <div class="">
+                                                <h6 class="kpi-txt">{{ $commodityExpense }}</h6>
                                             </div>
                                         </div>
 
@@ -194,6 +460,7 @@
                 </section>
             </div>
         </div>
+        
 
         <br>
 

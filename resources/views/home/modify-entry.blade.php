@@ -28,31 +28,50 @@
                                             <label for="Trade" class="form-label">Trade *</label>
                                             <select name="Trade" class="form-select" id="Trade" required>
                                                 <option value="{{ $val['Trade'] }}" default>{{ $val['Trade'] }}</option>
-                                                <option value="Swing" default>Swing</option>
+                                                <option value="Intraday">Intraday</option>
+                                                <option value="Swing">Swing</option>
                                                 <option value="Positional">Positional</option>
+                                                <option value="Dividend">Dividend</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
                                             <label for="Type" class="form-label">Instrument Type *</label>
                                             <select name="Type" class="form-select" id="Type" required>
-                                                <option value="{{ $val['Instrument'] }}" default>{{ $val['Instrument'] }}</option>
+                                                <option value="{{ $val['Instrument'] }}" default>{{ $val['Instrument'] }}
+                                                </option>
                                                 <option value="Equity">Equity</option>
                                                 <option value="Commodity">Commodity</option>
                                                 <option value="Options">Options</option>
-                                                <option value="Futures">Futures</option>
+                                                <option value="Futures" disabled>Futures</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
                                             <label for="Order" class="form-label">Order *</label>
                                             <select name="Order" class="form-select" id="Order" required>
                                                 <option value="{{ $val['Order'] }}" default>{{ $val['Order'] }}</option>
+                                                {{-- <option value="Entry"
+                                                    @if ($val['Order'] != 'Open' && $TradeID == 'NULL') {{ 'disabled' }} @endif>Entry
+                                                </option> --}}
                                                 <!-- <option value="In Process">In Process</option> -->
                                                 @if ($TradeID == 'NULL')
                                                     <option value="Open"
                                                         @if ($val['Order'] != 'In Process') {{ 'disabled' }} @endif>Open
                                                     </option>
                                                     <option value="Exit"
-                                                        @if ($val['Order'] != 'Open') {{ 'disabled' }} @endif>Exit
+                                                        @if ($val['Order'] != 'Open' || $val['Instrument'] == 'Commodity') {{ 'disabled' }} @endif>Exit
+                                                    </option>
+                                                    <option value="Buy"
+                                                        @if ($val['Order'] != 'Open' && $val['Instrument'] != 'Commodity') {{ 'disabled' }} @endif>Buy
+                                                    </option>
+                                                    <option value="Short"
+                                                        @if ($val['Order'] != 'Open' && $val['Instrument'] != 'Commodity') {{ 'disabled' }} @endif>Short
+                                                    </option>
+                                                @elseif ($TradeID != 'NULL')
+                                                    <option value="Bonus"
+                                                        @if ($val['Order'] != 'Open') {{ 'disabled' }} @endif>Bonus
+                                                    </option>
+                                                    <option value="Split"
+                                                        @if ($val['Order'] != 'Open') {{ 'disabled' }} @endif>Split
                                                     </option>
                                                 @endif
                                             </select>
@@ -60,7 +79,7 @@
                                         <div class="col-md-3">
                                             <label for="Date" class="form-label">Date *</label>
                                             <input type="date" name="Date"
-                                                value="@if($TradeID != 'NULL'){{$val['Date']}}@endif"
+                                                value="@if($TradeID != 'NULL'){{ $val['Date'] }}@endif"
                                                 class="form-control" id="Date" required>
                                             {{-- <input type="date" name="Date" value="{{ date("Y-m-d", strtotime($val['Date']))}}" class="form-control" id="Date" required> --}}
                                         </div>
@@ -75,9 +94,13 @@
                                             <select name="Chart" class="form-select" id="Chart" required>
                                                 <option value="{{ $val['Chart'] }}" default>{{ $val['Chart'] }}</option>
                                                 <option value="Daily">Daily</option>
+                                                <option value="3 min">3 min</option>
+                                                <option value="5 min">5 min</option>
+                                                <option value="15 min">15 min</option>
+                                                <option value="75 min">75 min</option>
+                                                <option value="1 Hour">1 Hour</option>
                                                 <option value="Weekly">Weekly</option>
                                                 <option value="Monthly">Monthly</option>
-                                                <option value="1 Hour">1 Hour</option>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
@@ -92,10 +115,13 @@
                                                 <option value="44 MA">44 MA</option>
                                                 <option value="30 MA">30 MA</option>
                                                 <option value="ABC">ABC</option>
+                                                <option value="ABC4">ABC4</option>
                                                 <option value="ATH">ATH</option>
                                                 <option value="ASIANPAINTS">ASIANPAINTS</option>
-                                                <option value="Triangle Break">Triangle Break</option>
+                                                <option value="Trend Line">Trend Line</option>
                                                 <option value="Double Bottom">Double Btm</option>
+                                                <option value="R62">R62</option>
+                                                <option value="Squeeze">Squeeze</option>
                                             </select>
                                         </div>
                                     </div>
@@ -110,7 +136,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label for="Stop_Loss" class="form-label">StopLoss *</label>
-                                            <input type="number" name="Stop_Loss" value="{{ $val['Stop_Loss'] }}"
+                                            <input type="number" name="Stop_Loss" value="{{ $Stop_Loss }}"
                                                 class="form-control candle" id="Stop_Loss" step=".01" required>
                                         </div>
                                         <div class="col-md-3">
@@ -150,6 +176,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                <br>
                                 <div class="col-12">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -157,13 +184,23 @@
                                             <input type="file" name="fileToUpload" class="form-control"
                                                 id="fileToUpload" required>
                                         </div>
-                                        <div class="col-md-6">
-                                            <input type="hidden" name="TradeID" value="{{ $TradeID }}"
-                                                class="form-control" id="TradeID">
+                                        <div class="col-md-3">
+                                            <label for="Charges" class="form-label">Charges *</label>
+                                            <input type="number" name="Charges" value="0" step=".01"
+                                                class="form-control" id="Charges">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="Others" class="form-label">Other Charges</label>
+                                            <input type="number" name="Others" value="0" step=".01"
+                                                class="form-control" id="Others">
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <input type="hidden" name="TradeID" value="{{ $TradeID }}"
+                                            class="form-control" id="TradeID">
+                                    </div>
                                 </div>
-                                </br>
+                                <br>
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary" name="entry_submit"
                                         id="entry_submit">Submit</button>
@@ -182,9 +219,11 @@
             $(document).ready(function() {
                 $("#Script").prop('readonly', true);
                 var Order = $("#Order").val();
+                var Type = $("#Type").val();
+                var Trade = $("#Trade").val();
                 if (Order == 'Open') {
                     $("#Exit").prop('readonly', true);
-                } else if (Order == 'Exit') {
+                } else if (Order == 'Exit' || Order == 'Buy' || Order == 'Short') {
                     $("#Entry").prop('readonly', true);
                     $("#Stop_Loss").prop('readonly', true);
                     $("#Target1_2").prop('readonly', true);
@@ -196,6 +235,11 @@
                     $("#Target1_2").prop('readonly', false);
                     $("#Target1_3").prop('readonly', false);
                 }
+                if (Type == 'Commodity' || (Type == 'Equity' && Trade == 'Intraday')) {
+                    $("#Charges").prop('disabled', false);
+                } else {
+                    $("#Charges").prop('disabled', true);
+                }
             });
             @if ($TradeID == 'NULL')
                 $(document).ready(function() {
@@ -206,7 +250,7 @@
                     if (Order == 'Open') {
                         $("#Exit").prop('readonly', true);
                         $("#entry_submit").prop('disabled', false);
-                    } else if (Order == 'Exit') {
+                    } else if (Order == 'Exit' || Order == 'Buy' || Order == 'Short') {
                         $("#Exit").prop('readonly', false);
                         $("#Entry").prop('readonly', true);
                         $("#Stop_Loss").prop('readonly', true);
@@ -222,25 +266,61 @@
                         $("#entry_submit").prop('disabled', true);
                     }
                 });
+                $("#Type").change(function() {
+                    var Type = $(this).val();
+                    var Trade = $("#Trade").val();
+                    if (Type == 'Commodity' || (Type == 'Equity' && Trade == 'Intraday')) {
+                        $("#Charges").prop('disabled', false);
+                    } else {
+                        $("#Charges").prop('disabled', true);
+                    }
+                });
+            @elseif ($TradeID != 'NULL')
+                $("#Order").change(function() {
+                    var Order = $(this).val();
+                    if (Order == 'Bonus' || Order == 'Split') {
+                        $("#Exit").prop('readonly', true);
+                        $("#Date").prop('readonly', true);
+                    } else {
+                        $("#Exit").prop('readonly', false);
+                        $("#Date").prop('readonly', false);
+                    }
+                });
             @endif
-
+            var Percent = 0.00;
             $(".candle").change(function() {
                 var Entry = $("#Entry").val();
                 var Stop_Loss = $("#Stop_Loss").val();
-                var Candle = (Entry - Stop_Loss) * 100 / Entry;
+                var Trade = $("#Trade").val();
+                var Order = $("#Order").val();
+
+                // Percent = Order=='Short'?(Stop_Loss - Entry):(Entry - Stop_Loss);
+                Percent = (Entry - Stop_Loss);
+                Percent = Percent < 0 ? Percent * -1 : Percent;
+                var Candle = (Percent * 100) / Entry;
                 var Quantity = $("#Quantity").val();
-                var Risk = (Entry - Stop_Loss) * Quantity;
+                var Risk = Percent * Quantity;
+
                 $("#Candle").val(Candle.toFixed(2));
                 $("#Risk").val(Risk);
             });
             $("#Quantity").change(function() {
                 var Entry = $("#Entry").val();
                 var Stop_Loss = $("#Stop_Loss").val();
+                var Trade = $("#Trade").val();
+                var Order = $("#Order").val();
+
+                // Percent = Order=='Short'?(Stop_Loss - Entry):(Entry - Stop_Loss);
+                Percent = (Entry - Stop_Loss);
+                Percent = Percent < 0 ? Percent * -1 : Percent;
+                var Candle = (Percent * 100) / Entry;
                 var Quantity = $("#Quantity").val();
-                var Risk = (Entry - Stop_Loss) * Quantity;
+                var Risk = Percent * Quantity;
+
+                $("#Candle").val(Candle.toFixed(2));
                 $("#Risk").val(Risk);
             });
 
         });
-       </script>
+    </script>
 @endsection

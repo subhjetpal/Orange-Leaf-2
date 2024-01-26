@@ -21,6 +21,12 @@ use App\Http\Controllers\HomeController;
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{ request()->path() == 'gallery' ? 'active' : '' }}" href="{{ url('/gallery') }}">
+                    <i class="bi bi-card-image"></i>
+                    <span>Gallery</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {{ request()->path() == 'add-entry' ? 'active' : '' }}" href="{{ url('/add-entry') }}">
                     <i class="bx bi-journals"></i>
                     <span>Add Entry</span>

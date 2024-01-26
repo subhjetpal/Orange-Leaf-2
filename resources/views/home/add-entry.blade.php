@@ -28,8 +28,8 @@
                                             <label for="Trade" class="form-label">Trade *</label>
                                             <select name="Trade" class="form-select" id="Trade" required>
                                                 <option value="" default>Select</option>
-                                                <option value="Swing">Swing</option>
                                                 <option value="Intraday">Intraday</option>
+                                                <option value="Swing">Swing</option>
                                                 <option value="Positional">Positional</option>
                                                 <option value="Dividend">Dividend</option>
                                             </select>
@@ -37,10 +37,11 @@
                                         <div class="col-md-3">
                                             <label for="Type" class="form-label">Instrument Type *</label>
                                             <select name="Type" class="form-select" id="Type" required>
-                                                <option value="Equity" default>Equity</option>
+                                                <option value="" default>Select</option>
+                                                <option value="Equity">Equity</option>
                                                 <option value="Commodity">Commodity</option>
                                                 <option value="Options">Options</option>
-                                                <option value="Futures">Futures</option>
+                                                <option value="Futures" disabled>Futures</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
@@ -51,7 +52,7 @@
                                                 <option value="Open" id="Open">Open</option>
                                                 <option value="Buy">Buy</option>
                                                 <option value="Short">Short</option>
-                                                <option value="Exit" id="Exit">Exit</option>
+                                                <option value="Exit" id="Exit_O">Exit</option>
                                             </select>
                                         </div>
                                         <div class="col-md-3">
@@ -69,8 +70,10 @@
                                             <label for="Chart" class="form-label">Chart *</label>
                                             <select name="Chart" class="form-select" id="Chart" required>
                                                 <option value="Daily" default>Daily</option>
+                                                <option value="3 min">3 min</option>
                                                 <option value="5 min">5 min</option>
                                                 <option value="15 min">15 min</option>
+                                                <option value="75 min">75 min</option>
                                                 <option value="1 Hour">1 Hour</option>
                                                 <option value="Weekly">Weekly</option>
                                                 <option value="Monthly">Monthly</option>
@@ -85,13 +88,15 @@
                                             <label for="System" class="form-label">System *</label>
                                             <select name="System" class="form-select" id="System" required>
                                                 <option value="44 MA" default>44 MA</option>
-                                                <option value="30 MA" default>30 MA</option>
+                                                <option value="30 MA">30 MA</option>
                                                 <option value="ABC">ABC</option>
                                                 <option value="ABC4">ABC4</option>
                                                 <option value="ATH">ATH</option>
                                                 <option value="ASIANPAINTS">ASIANPAINTS</option>
-                                                <option value="Triangle Break">Triangle Break</option>
+                                                <option value="Trend Line">Trend Line</option>
                                                 <option value="Double Bottom">Double Btm</option>
+                                                <option value="R62">R62</option>
+                                                <option value="Squeeze">Squeeze</option>
                                             </select>
                                         </div>
                                     </div>
@@ -121,7 +126,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                </br>
+                                <br>
                                 <div class="col-12">
                                     <div class="row">
                                         <div class="col-md-3">
@@ -154,11 +159,16 @@
                                             <input type="file" name="fileToUpload" class="form-control"
                                                 id="fileToUpload">
                                         </div>
-                                        {{-- <div class="col-md-6">
+                                        <div class="col-md-3">
                                             <label for="Charges" class="form-label">Charges *</label>
-                                            <input type="number" name="Charges" value="0" step=".01"
+                                            <input type="number" name="Charges" value="20" step=".01"
                                                 class="form-control" id="Charges">
-                                        </div> --}}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="Others" class="form-label">Other Charges</label>
+                                            <input type="number" name="Others" value="0" step=".01"
+                                                class="form-control" id="Others">
+                                        </div>
                                     </div>
                                 </div>
                                 <br>
@@ -189,20 +199,20 @@
             $(".candle").change(function() {
                 var Entry = $("#Entry").val();
                 var Stop_Loss = $("#Stop_Loss").val();
-                var Trade = $("#Trade").val();
-                var Order = $("#Order").val();
+                // var Trade = $("#Trade").val();
+                // var Order = $("#Order").val();
 
-                Percent = Order=='Short'?(Stop_Loss - Entry):(Entry - Stop_Loss);
-
+                // Percent = Order=='Short'?(Stop_Loss - Entry):(Entry - Stop_Loss);
+                Percent = (Entry - Stop_Loss);
+                Percent = Percent < 0 ? Percent * -1 : Percent;
                 var Candle = (Percent * 100) / Entry;
                 var Quantity = $("#Quantity").val();
                 var Risk = Percent * Quantity;
+
                 $("#Candle").val(Candle.toFixed(2));
                 $("#Risk").val(Risk.toFixed(2));
             });
             $("#Quantity").change(function() {
-                var Entry = $("#Entry").val();
-                var Stop_Loss = $("#Stop_Loss").val();
                 var Quantity = $("#Quantity").val();
 
                 var Risk = Percent * Quantity;
@@ -212,6 +222,11 @@
                 var Order = $(this).val();
                 if (Order == 'In Process') {
                     $("#Date").prop('disabled', true);
+                    $("#fileToUpload").prop('disabled', true);
+                    $("#Exit").prop('disabled', true);
+                } else if (Order == 'Open') {
+                    $("#fileToUpload").prop('disabled', false);
+                    $("#Date").prop('disabled', false);
                     $("#Exit").prop('disabled', true);
                 } else {
                     $("#Date").prop('disabled', false);
@@ -222,7 +237,6 @@
                 var Trade = $(this).val();
                 if (Trade == 'Positional') {
                     $("#In_Process").prop('disabled', false);
-                    $("#Open").prop('disabled', false);
                     $("#Order").prop('disabled', false);
                     $("#System").prop('disabled', false);
                     $("#Entry").prop('readonly', false);
@@ -231,11 +245,10 @@
                     $("#Target1_2").prop('readonly', true);
                     $("#Target1_3").prop('readonly', true);
                     $("#Risk").prop('disabled', false);
-                    $("#Charges").prop('disabled', true);
                     $("#fileToUpload").prop('disabled', true);
                 } else if (Trade == 'Dividend') {
                     $("#Order").prop('disabled', true);
-                    $("#Type").prop('disabled', true);
+                    $("#Type").prop('disabled', false);
                     $("#System").prop('disabled', true);
                     $("#Entry").prop('readonly', true);
                     $("#Chart").prop('disabled', true);
@@ -243,17 +256,14 @@
                     $("#Target1_2").prop('readonly', true);
                     $("#Target1_3").prop('readonly', true);
                     $("#Risk").prop('disabled', true);
-                    $("#Charges").prop('disabled', true);
                     $("#fileToUpload").prop('disabled', true);
                 } else if (Trade == 'Intraday') {
                     $("#fileToUpload").prop('disabled', false);
-                    $("#Charges").prop('disabled', false);
-                    $("#Open").prop('disabled', true);
                     $("#In_Process").prop('disabled', true);
-                    $("#Exit").prop('disabled', true);
+                    $("#Exit").prop('disabled', false);
+                    $("#Exit_O").prop('disabled', true);
                 } else {
                     $("#In_Process").prop('disabled', false);
-                    $("#Open").prop('disabled', false);
                     $("#Order").prop('disabled', false);
                     $("#Type").prop('disabled', false);
                     $("#System").prop('disabled', false);
@@ -263,11 +273,18 @@
                     $("#Target1_2").prop('readonly', false);
                     $("#Target1_3").prop('readonly', false);
                     $("#Risk").prop('disabled', false);
-                    $("#Open").prop('disabled', false);
                     $("#In_Process").prop('disabled', false);
-                    $("#Exit").prop('disabled', false);
-                    $("#Charges").prop('disabled', true);
+                    $("#Exit").prop('disabled', true);
                     $("#fileToUpload").prop('disabled', true);
+                }
+            });
+            $("#Type").change(function() {
+                var Type = $(this).val();
+                var Trade = $("#Trade").val();
+                if (Type == 'Commodity' || Type == 'Options' || (Type == 'Equity' && Trade == 'Intraday')) {
+                    $("#Charges").prop('disabled', false);
+                } else {
+                    $("#Charges").prop('disabled', true);
                 }
             });
         });

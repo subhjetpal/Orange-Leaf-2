@@ -15,7 +15,7 @@ class UserAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $page=array('login','index','/','calculator','emi-calculator','404','500');
+        $page=array('login','index','/','calculator','emi-calculator','404','500','emotion');
         if($request->path()=="login" && $request->session()->has('user')){
             return redirect('/home');
         }

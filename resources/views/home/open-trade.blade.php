@@ -49,6 +49,7 @@
                                         <th scope="col">Candle%</th>
                                         <th scope="col">Risk</th>
                                         <th scope="col">Action</th>
+                                        <th scope="col">Exited</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,6 +81,11 @@
                                                         class=""
                                                         onclick="return confirm('Are You sure Want to Upgrade {{ $val['Script'] }}')"><i
                                                             class="bi bi-arrow-up-square"></i></a>
+                                                </td>
+                                                <td>
+                                                    <a href="is-closed/{{ $val['TradeID'] }}"
+                                                        onclick="return confirm('Are you Sure {{ $val['Script'] }} Closed ?')"><i
+                                                            class="bi bi-x-square"></i></a>
                                                 </td>
                                                 <!-- Script Link for Chart View -->
 

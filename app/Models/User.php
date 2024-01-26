@@ -24,6 +24,7 @@ class User extends Authenticatable
         'myusername',
         'mypassword',
         'image_url',
+        'device_token'
     ];
 
     /**

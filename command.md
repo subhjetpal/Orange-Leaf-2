@@ -1,3 +1,5 @@
+# Create Applicatio
+composer create-project laravel/laravel application-name
 # Run Application
 >>php artisan serve --port=8888
 

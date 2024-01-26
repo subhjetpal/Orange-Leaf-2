@@ -61,6 +61,14 @@ Route::get('/calculator', function () {
     return view('home.calculator');
 });
 
+Route::get('/emotion', function () {
+    return view('home.emotion');
+});
+
+Route::get('/gallery', function () {
+    return view('home.gallery');
+});
+
 Route::get('/emi-calculator', function () {
     return view('home.emi-calculator');
 });
@@ -68,6 +76,8 @@ Route::get('/emi-calculator', function () {
 Route::get('/modify-entry/{Stage}/{Order}/{TradeID}', [HomeController::class, 'modifyEntryFetch']);
 
 Route::post('/modify-entry', [HomeController::class, 'modifyEntry']);
+
+Route::get('/is-closed/{TradeID}', [HomeController::class, 'isClosed']);
 
 Route::get('/trade-journal', [HomeController::class, 'tradeJournal']);
 
