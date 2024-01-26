@@ -19,5 +19,4 @@ yarn-error.log
 /.vscode
 .zip
 /.png
-guide.md
-/sheets
+command.md

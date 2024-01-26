@@ -964,7 +964,6 @@ class HomeController extends Controller
             }
         } elseif ($req->Order == 'Open'  && $req->TradeID != "NULL") {
             $Trade =  strtoupper($req->Trade);
-            $Type = $req->Type;
             $Order =  $req->Order;
             $Date = $req->Date;
             $Chart = $req->Chart;
@@ -1005,10 +1004,8 @@ class HomeController extends Controller
                     ->update([
                         // 'TradeID' => $TradeID,
                         // 'Order' => $Order,
-                        'Instrument' => $Type,
-                        // 'Date' => $Date,
+                        'Date' => $Date,
                         'System' => $System,
-                        'Chart' => $Chart,
                         'Entry' => $Entry,
                         'Stop_Loss' => $Stop_Loss,
                         'Target1_2' => $Target1_2,
@@ -1115,7 +1112,6 @@ class HomeController extends Controller
         }
         elseif ($req->Order == 'Exit' && $req->TradeID != "NULL") {
             $Trade =  $req->Trade;
-            $Type = $req->Type;
             // $Order =  $req->Order;
             $Date = $req->Date;
             $Chart = $req->Chart;
@@ -1162,8 +1158,7 @@ class HomeController extends Controller
                     ->update([
                         // 'TradeID' => $TradeID,
                         // 'Order' => $Order,
-                        'Instrument' => $Type,
-                        // 'Date' => $Date,
+                        'Date' => $Date,
                         'System' => $System,
                         'Entry' => $Entry,
                         'Exit' => $Exit,
@@ -1273,15 +1268,16 @@ class HomeController extends Controller
                 ->delete();
             $req->session()->put('alert', 'Successfully Deleted Record');
             return redirect('open-trade');
-        } elseif ($Order == "Delete") {
-            TradeJournal::where('TradeID', $TradeID)
+        } elseif ($Order == "DEL-J") {
+            $delete = TradeJournal::where('TradeID', $TradeID)
                 ->delete();
-            TradeSummary::where('TradeID', $TradeID)
+        } elseif ($Order == "DEL-S") {
+            $delete = TradeSummary::where('TradeID', $TradeID)
                 ->delete();
-            Expense::where('TradeID', $TradeID)
+        }
+        elseif ($Order == "DEL-E") {
+            $delete = Expense::where('TradeID', $TradeID)
                 ->delete();
-            $req->session()->put('alert', "'Successfully Deleted All Record of '.$TradeID'");
-            return redirect('open-trade');
         }
         return redirect('open-trade');
     }

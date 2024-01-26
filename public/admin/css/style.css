@@ -7,6 +7,7 @@
     font-family: "Open Sans", sans-serif;
     background: #f6f9ff;
     color: #444444;
+    font-size: 14px;
   }
   
   a {
@@ -189,8 +190,8 @@
   }
   
   .bg-warning-light {
-    background-color: #2e40523cd;
-    border-color: #2e40523cd;
+    background-color: #2e4052;
+    border-color: #2e4052;
   }
   
   .bg-info-light {
