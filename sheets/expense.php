@@ -25,7 +25,7 @@ if ($res) {
         for ($i = 0; $i < count($record); $i += $batchSize) {
             $batch = array_slice($record, $i, $batchSize);
             foreach ($record as $val) {
-                $newrow = [$val['SchemeID'], $val['UserID'], $val['ExpenseID'], $val['TradeID'], $val['Date'], $val['Instrument'], $val['Amount'], $val['Charges']];
+                $newrow = [$val['UserID'], $val['ExpenseID'], $val['TradeID'], $val['Date'], $val['Instrument'], $val['Amount'], $val['Charges']];
                 $rows = [$newrow];
                 $res = insert($tb_expense, $rows);
         

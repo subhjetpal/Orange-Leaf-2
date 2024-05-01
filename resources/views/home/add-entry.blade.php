@@ -222,6 +222,9 @@
                 var Order = $(this).val();
                 if (Order == 'In Process') {
                     $("#Date").prop('disabled', true);
+                    $("#Chart").prop('disabled', true);
+                    $("#Order").prop('disabled', true);
+                    $("#System").prop('disabled', true);
                     $("#fileToUpload").prop('disabled', true);
                     $("#Exit").prop('disabled', true);
                 } else if (Order == 'Open') {
@@ -230,6 +233,9 @@
                     $("#Exit").prop('disabled', true);
                 } else {
                     $("#Date").prop('disabled', false);
+                    $("#Chart").prop('disabled', false);
+                    $("#Order").prop('disabled', false);
+                    $("#System").prop('disabled', false);
                     $("#Exit").prop('disabled', false);
                 }
             });

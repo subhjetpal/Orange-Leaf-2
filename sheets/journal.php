@@ -25,7 +25,7 @@ if ($res) {
             $batch = array_slice($record, $i, $batchSize);
             foreach ($batch as $val) {
                 $rowNo = getRow($tb_journal_nse, $val['TradeID']);
-                $newrow = [$val['SchemeID'], $val['UserID'], $val['TradeID'], $val['Trade'], $val['Instrument'], $val['Order'], $val['Date'], $val['Chart'], $val['Script'], $val['System'], $val['Entry'], $val['Stop_Loss'], $val['Target1_2'], $val['Target1_3'], $val['Exit'], $val['Quantity'], $val['Candle'], $val['Risk'], $val['STT'], $val['ImageURL']];
+                $newrow = [$val['UserID'], $val['TradeID'], $val['Trade'], $val['Instrument'], $val['Order'], $val['Date'], $val['Chart'], $val['Script'], $val['System'], $val['Entry'], $val['Stop_Loss'], $val['Target1_2'], $val['Target1_3'], $val['Exit'], $val['Quantity'], $val['Candle'], $val['Risk'], $val['STT'], $val['ImageURL']];
                 $rows = [$newrow];
                 if ($rowNo == 0) {
                     $res = insert($tb_journal_nse, $rows);

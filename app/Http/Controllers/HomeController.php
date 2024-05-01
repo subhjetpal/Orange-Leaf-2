@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\TradeJournal;
 use App\Models\TradeSummary;
-use App\Models\Scheme;
-use App\Models\Sector;
-use App\Models\Lend;
+use App\Models\User;
 use App\Models\Expense;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Session;
@@ -55,7 +53,7 @@ class HomeController extends Controller
         $comment = new Comment;
 
         $comment->UserID = $req->session()->get('user')['UserID'];
-        $comment->SchemeID = '23TRA7546';
+        // $comment->SchemeID = '23TRA7546';
         $comment->TradeID = $req->TradeID;
         $comment->CommentID = rand(1000, 9999);
         $comment->Date = date("ymd");
@@ -76,18 +74,18 @@ class HomeController extends Controller
         $EndDate = date('Y-m-d'); // today
 
         
-        // Scheme
-        $Capital = Scheme::where('SchemeID', '23EGD8564')->first();
-        $equityCap = $Capital->Capital;
+        // Portfolio
+        $Capital = User::where('UserID', $req->session()->get('user')['UserID'])->first();
+        $equityCap = $Capital->Investment;
         $swingCap = $equityCap * 0.4;
         $positionalCap = $equityCap * 0.5;
 
-        $Capital = Scheme::where('SchemeID', '23TRA7546')->first();
-        $intraCap = $Capital->Capital;
+        $Capital = User::where('UserID', $req->session()->get('user')['UserID'])->first();
+        $intraCap = $Capital->Speculation;
         $optionsCap = $intraCap * 0.80;
         $commodityCap = $intraCap * 0.20;
 
-        // Equity
+        // Investment
         $journalData = TradeJournal::where(function($query) {
             $query->where('Order', 'Open')
                   ->orWhere('Order', 'In Process');
@@ -296,15 +294,15 @@ class HomeController extends Controller
 
             $tb = new TradeJournal;
 
-            $tb->UserID = $req->session()->get('user')['UserID'];
-            $tb->SchemeID = '23EGD8564';
+            $tb->UserID = $req->session()->get('user')['UserID'];//$req->UserID
+            // $tb->SchemeID = '23EGD8564';
             $tb->Instrument = $req->Type;
             $tb->Trade = $req->Trade;
-            $tb->Order =  $req->Order;
+            // $tb->Order =  $req->Order;
             // $Date = $req->Date;
-            $tb->Chart = $req->Chart;
+            // $tb->Chart = $req->Chart;
             $tb->Script = strtoupper($req->Script);
-            $tb->System = $req->System;
+            // $tb->System = $req->System;
             $tb->Entry = $req->Entry;
             $tb->Stop_Loss = $req->Stop_Loss;
             $tb->Target1_2 = $req->Target1_2;
@@ -350,7 +348,7 @@ class HomeController extends Controller
             $summary = new TradeSummary;
 
             $summary->UserID = $req->session()->get('user')['UserID'];
-            $summary->SchemeID = '23EGD8564';
+            // $summary->SchemeID = '23EGD8564';
             $summary->TradeID = $TradeID_S;
             $summary->Instrument = $Type;
             $summary->Trade = $Trade;
@@ -422,7 +420,7 @@ class HomeController extends Controller
                 $entry = new TradeJournal;
 
                 $entry->UserID = $req->session()->get('user')['UserID'];
-                $entry->SchemeID = '23TRA7546';
+                // $entry->SchemeID = '23TRA7546';
                 $entry->TradeID = $TradeID;
                 $entry->Trade = $Trade;
                 $entry->Instrument = $Type;
@@ -457,7 +455,7 @@ class HomeController extends Controller
                 $summary = new TradeSummary;
 
                 $summary->UserID = $req->session()->get('user')['UserID'];
-                $summary->SchemeID = '23TRA7546';
+                // $summary->SchemeID = '23TRA7546';
                 $summary->TradeID = $TradeID;
                 $summary->Trade = $Trade;
                 $summary->Instrument = $Type;
@@ -481,7 +479,7 @@ class HomeController extends Controller
                 $expense = new Expense;
 
                 $expense->UserID = $req->session()->get('user')['UserID'];
-                $expense->SchemeID = '23TRA7546';
+                // $expense->SchemeID = '23TRA7546';
                 $expense->ExpenseID = $ExpenseID;
                 $expense->TradeID = $TradeID;
                 $expense->Date = $Date;
@@ -498,15 +496,15 @@ class HomeController extends Controller
 
             if ($req->Type == 'Equity') {
                 $STT = $req->Entry * $req->Quantity * 0.001;
-                $SchemeID = '23EGD8564';
+                // $SchemeID = '23EGD8564';
                 $Charges=0;
             } elseif ($req->Type == 'Commodity') {
                 $STT = 0;
-                $SchemeID = '23TRA7546';
+                // $SchemeID = '23TRA7546';
                 $Charges=$req->Charges;
             } elseif ($req->Type == 'Options'){
                 $STT = 0;
-                $SchemeID = '23TRA7546';
+                // $SchemeID = '23TRA7546';
                 $Charges=$req->Charges;
             }
 
@@ -533,7 +531,7 @@ class HomeController extends Controller
                 $tb = new TradeJournal;
 
                 $tb->UserID = $req->session()->get('user')['UserID'];
-                $tb->SchemeID = $SchemeID;
+                // $tb->SchemeID = $SchemeID;
                 $tb->TradeID = $TradeID;
                 $tb->Trade = $req->Trade;
                 $tb->Instrument = $req->Type;
@@ -724,7 +722,7 @@ class HomeController extends Controller
                 $ExitSTT = $Exit * $Quantity * 0.001;
 
                 $STT = $EntrySTT + $ExitSTT;
-                $SchemeID = '23EGD8564';
+                // $SchemeID = '23EGD8564';
             } 
 
             // date format to 10MAR2022
@@ -749,7 +747,7 @@ class HomeController extends Controller
                 $entry = new TradeJournal;
 
                 $entry->UserID = $req->session()->get('user')['UserID'];
-                $entry->SchemeID = $SchemeID;
+                // $entry->SchemeID = $SchemeID;
                 $entry->TradeID = $TradeID;
                 $entry->Trade = $Trade;
                 $entry->Instrument = $Type;
@@ -786,7 +784,7 @@ class HomeController extends Controller
                 $summary = new TradeSummary;
 
                 $summary->UserID = $req->session()->get('user')['UserID'];
-                $summary->SchemeID = $SchemeID;
+                // $summary->SchemeID = $SchemeID;
                 $summary->TradeID = $TradeID;
                 $summary->Trade = $Trade;
                 $summary->Instrument = $Type;
@@ -817,7 +815,7 @@ class HomeController extends Controller
                 $expense = new Expense;
 
                 $expense->UserID = $req->session()->get('user')['UserID'];
-                $expense->SchemeID = $SchemeID;
+                // $expense->SchemeID = $SchemeID;
                 $expense->ExpenseID = $ExpenseID;
                 $expense->TradeID = $TradeID;
                 $expense->Date = $Date;
@@ -852,15 +850,15 @@ class HomeController extends Controller
 
             if ($req->Type == 'Equity') {
                 $STT = $value * $Quantity * 0.000125;
-                $SchemeID = '23EGD8564';
+                // $SchemeID = '23EGD8564';
                 $Charges = $req->Charges;
             } elseif ($req->Type == 'Commodity') {
                 $STT = $value * $Quantity * 0.0001;
-                $SchemeID = '23TRA7546';
+                // $SchemeID = '23TRA7546';
                 $Charges = $req->Charges;
             } elseif ($req->Type == 'Options') {
                 $STT = $value * $Quantity * 0.000625;
-                $SchemeID = '23TRA7546';
+                // $SchemeID = '23TRA7546';
                 $Charges = $req->Charges;
             }
 
@@ -888,7 +886,7 @@ class HomeController extends Controller
                 $entry = new TradeJournal;
 
                 $entry->UserID = $req->session()->get('user')['UserID'];
-                $entry->SchemeID = $SchemeID;
+                // $entry->SchemeID = $SchemeID;
                 $entry->TradeID = $TradeID;
                 $entry->Trade = $Trade;
                 $entry->Instrument = $Type;
@@ -925,7 +923,7 @@ class HomeController extends Controller
                 $summary = new TradeSummary;
 
                 $summary->UserID = $req->session()->get('user')['UserID'];
-                $summary->SchemeID = $SchemeID;
+                // $summary->SchemeID = $SchemeID;
                 $summary->TradeID = $TradeID;
                 $summary->Trade = $Trade;
                 $summary->Instrument = $Type;
@@ -949,7 +947,7 @@ class HomeController extends Controller
                 $expense = new Expense;
 
                 $expense->UserID = $req->session()->get('user')['UserID'];
-                $expense->SchemeID = $SchemeID;
+                // $expense->SchemeID = $SchemeID;
                 $expense->ExpenseID = $ExpenseID;
                 $expense->TradeID = $TradeID;
                 $expense->Date = $Date;
@@ -1084,7 +1082,7 @@ class HomeController extends Controller
                 $entry = new TradeJournal;
 
                 $entry->UserID = $req->session()->get('user')['UserID'];
-                $entry->SchemeID = '23EGD8564';
+                // $entry->SchemeID = '23EGD8564';
                 $entry->TradeID = $TradeID;
                 $entry->Trade = $Trade;
                 $entry->Instrument = $Type;
@@ -1133,7 +1131,7 @@ class HomeController extends Controller
                 $ExitSTT = $Exit * $Quantity * 0.001;
 
                 $STT = $EntrySTT + $ExitSTT;
-                $SchemeID = '23EGD8564';
+                // $SchemeID = '23EGD8564';
             } 
 
             // date format to 10MAR2022

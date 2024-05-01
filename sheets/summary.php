@@ -25,7 +25,7 @@ if ($res) {
         for ($i = 0; $i < count($record); $i += $batchSize) {
             $batch = array_slice($record, $i, $batchSize);
         foreach ($batch as $val) {
-            $newrow = [$val['SchemeID'], $val['UserID'], $val['TradeID'], $val['Trade'], $val['Instrument'], $val['Transact'], $val['Date'], $val['Script'], $val['Entry'], $val['Exit'], $val['Quantity'], $val['STT'], $val['Percent'], $val['Profit_Loss']];
+            $newrow = [$val['UserID'], $val['TradeID'], $val['Trade'], $val['Instrument'], $val['Transact'], $val['Date'], $val['Script'], $val['Entry'], $val['Exit'], $val['Quantity'], $val['STT'], $val['Percent'], $val['Profit_Loss']];
             $rows = [$newrow];
             $res = insert($tb_summary, $rows);
             
