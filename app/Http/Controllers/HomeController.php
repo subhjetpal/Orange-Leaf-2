@@ -9,6 +9,7 @@ use App\Models\TradeSummary;
 use App\Models\User;
 use App\Models\Expense;
 use App\Models\Comment;
+use App\Models\Profile;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -16,19 +17,16 @@ use Illuminate\Support\Facades\Storage;
 class HomeController extends Controller
 {
     private function riskRange($Capital,$TotalRisk,$usedRisk,$RiskP){
+        // Needs Modification for a positive side
         if($usedRisk<$TotalRisk){
             return $TotalRisk;
         }else{
             $usedRisk_=$usedRisk-$TotalRisk;
             $TotalRisk_=($Capital-$TotalRisk)*$RiskP;
-            // NEWTotalRisk, PREVTotalRisk,  (based on NEW and PREv Total Risk) -> positionalRisk, InMkt_Positional
-            // $InMktRiskSwing-$swingTotalRisk
-            // ($swingCap-$swingTotalRisk) * $RiskP
-            // 
             return $this->riskRange($Capital,$TotalRisk_,$usedRisk_,$RiskP);
         }
     }
-    function template(Request $req)
+    function chartData(Request $req)
     {
 
         $Data = TradeJournal::all();
@@ -50,9 +48,12 @@ class HomeController extends Controller
     }
     function addComment(Request $req)
     {
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+
         $comment = new Comment;
 
-        $comment->UserID = $req->session()->get('user')['UserID'];
+        $comment->UserID = $User;
         // $comment->SchemeID = '23TRA7546';
         $comment->TradeID = $req->TradeID;
         $comment->CommentID = rand(1000, 9999);
@@ -73,38 +74,32 @@ class HomeController extends Controller
         $StartDate = $LatestQuarterDate; // quarter
         $EndDate = date('Y-m-d'); // today
 
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['Username'];
+
         
-        // Portfolio
-        $Capital = User::where('UserID', $req->session()->get('user')['UserID'])->first();
-        $equityCap = $Capital->Investment;
-        $swingCap = $equityCap * 0.4;
-        $positionalCap = $equityCap * 0.5;
+        // Investmnet Capital
+        $data = Profile::where('Username', $User)
+            ->where('User_Type', 'Investor')
+            ->first();
+        $positionalCap = empty($data->Capiatl)? 0 : $data->Capiatl;
 
-        $Capital = User::where('UserID', $req->session()->get('user')['UserID'])->first();
-        $intraCap = $Capital->Speculation;
-        $optionsCap = $intraCap * 0.80;
-        $commodityCap = $intraCap * 0.20;
+        // Speculation Capital
+        $data = Profile::where('Username', $User)
+            ->where('User_Type','Speculator')
+            ->first();
+        $sCap = empty($data->Capiatl)? 0 : $data->Capiatl;
 
-        // Investment
-        $journalData = TradeJournal::where(function($query) {
-            $query->where('Order', 'Open')
-                  ->orWhere('Order', 'In Process');
-        })
-        ->where('Instrument', 'Equity')
-        ->where('Trade', 'Swing')
-        ->get();
+        $Portfolio = $positionalCap+$sCap;
 
-        $journalTrade = $journalData->toArray();
-        $tradeCollect = collect($journalTrade);
-
-        $InMktRiskSwing = $tradeCollect->sum('Risk');
-
+        // Open Risk
         $journalData = TradeJournal::where(function($query) {
             $query->where('Order', 'Open')
                   ->orWhere('Order', 'In Process');
         })
         ->where('Instrument', 'Equity')
         ->where('Trade', 'Positional')
+        ->where('UserID', $User)
         ->get();
 
         $journalTrade = $journalData->toArray();
@@ -112,9 +107,24 @@ class HomeController extends Controller
 
         $InMktRiskPositional = $tradeCollect->sum('Risk');
 
+        $journalData = TradeJournal::where(function($query) {
+            $query->where('Order', 'Open')
+                  ->orWhere('Order', 'In Process');
+        })
+        ->where('Instrument', 'Equity')
+        ->where('Trade', 'Swing')
+        ->where('UserID', $User)
+        ->get();
+
+        $journalTrade = $journalData->toArray();
+        $tradeCollect = collect($journalTrade);
+
+        $InMktRiskSwing = $tradeCollect->sum('Risk');
+
         // Expense
         $Equity = Expense::where('Instrument', 'Equity')
             ->whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
             ->get();
 
         $Expense_ = $Equity->toArray();
@@ -122,8 +132,10 @@ class HomeController extends Controller
 
         $equityExpense = $ExpenseCollect->sum('Amount');
 
+
         $Options = Expense::where('Instrument', 'Options')
             ->whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
             ->get();
 
         $Expense_ = $Options->toArray();
@@ -133,6 +145,7 @@ class HomeController extends Controller
 
         $Commodity = Expense::where('Instrument', 'Commodity')
             ->whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
             ->get();
 
         $Expense_ = $Commodity->toArray();
@@ -144,6 +157,7 @@ class HomeController extends Controller
         $summaryData = TradeSummary::where('Instrument', 'Equity')
             ->where('Trade', 'Positional')
             ->whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
             ->get();
 
         $summaryTrade = $summaryData->toArray();
@@ -151,9 +165,12 @@ class HomeController extends Controller
 
         $turnoverPositional = $summaryCollect->sum('Profit_Loss');
 
+
+
         $summaryData = TradeSummary::where('Instrument', 'Equity')
             ->where('Trade', 'Swing')
             ->whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
             ->get();
 
         $summaryTrade = $summaryData->toArray();
@@ -161,8 +178,11 @@ class HomeController extends Controller
 
         $turnoverSwing = $summaryCollect->sum('Profit_Loss');
 
+
+
         $summaryData = TradeSummary::where('Instrument', 'Options')
             ->whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
             ->get();
 
         $summaryTrade = $summaryData->toArray();
@@ -170,8 +190,11 @@ class HomeController extends Controller
 
         $turnOverOptions = $summaryCollect->sum('Profit_Loss');
 
+
+
         $summaryData = TradeSummary::where('Instrument', 'Commodity')
-            ->whereBetween('Date', [$StartDate, $EndDate])    
+            ->whereBetween('Date', [$StartDate, $EndDate])   
+            ->where('UserID', $User) 
             ->get();
 
         $summaryTrade = $summaryData->toArray();
@@ -179,50 +202,45 @@ class HomeController extends Controller
 
         $turnOverCommodity = $summaryCollect->sum('Profit_Loss');
 
-       
 
-        // $Allocation = Sector::where('SchemeID','23TRA7546')
-        // ->where()
-        // ->get();
-        
+        $positionalRisk = $Portfolio * 0.01;
 
-        $positionalRisk = $equityCap * 0.01;
-        $swingRisk = $swingCap * 0.01;
-        $optionsRisk = $optionsCap * 0.005;
-        $commodityRisk = $commodityCap * 0.01;
+        $swingRisk = $sCap * 0.01;
+        $optionsRisk = $sCap * 0.01;
+        $commodityRisk = $sCap * 0.01;
 
         $positionalTotalRisk = $positionalCap * 0.1;
-        $swingTotalRisk = $swingCap * 0.1;
-        $optionsTotalRisk = $optionsCap * 0.05;
-        $commodityTotalRisk = $commodityCap * 0.1;
+        $swingTotalRisk = $sCap * 0.1;
+        $optionsTotalRisk = $sCap * 0.05;
+        $commodityTotalRisk = $sCap * 0.1;
 
         // UsedRisk = InMktRisk - p/(l)
 
         $PostionalUsedRisk = $InMktRiskPositional - $turnoverPositional;
-        $SwingUsedRisk = $InMktRiskSwing - $turnoverSwing;
+        $SwingUsedRisk = $InMktRiskSwing - $turnoverSwing;// subtracting unrealised profitx40%
 
         $positional_TotalRisk=$this->riskRange($positionalCap,$positionalTotalRisk,$PostionalUsedRisk,0.1);
-        $swing_TotalRisk=$this->riskRange($swingCap,$swingTotalRisk,$SwingUsedRisk,0.1);
-        $options_TotalRisk=$this->riskRange($optionsCap,$optionsTotalRisk,$turnOverOptions*-1,0.05);
-        $commodity_TotalRisk=$this->riskRange($commodityCap,$commodityTotalRisk,$turnOverCommodity*-1,0.1);
+        $swing_TotalRisk=$this->riskRange($sCap,$swingTotalRisk,$SwingUsedRisk,0.1);
+        $options_TotalRisk=$this->riskRange($sCap,$optionsTotalRisk,$turnOverOptions*-1,0.05);
+        $commodity_TotalRisk=$this->riskRange($sCap,$commodityTotalRisk,$turnOverCommodity*-1,0.1);
 
-        $positionalRisk = $positional_TotalRisk<$positionalTotalRisk?($equityCap-$positionalTotalRisk) * 0.01:$positionalRisk;
-        $swingRisk = $swing_TotalRisk<$swingTotalRisk?($swingCap-$swingTotalRisk) * 0.01:$swingRisk;
-        $optionsRisk = $options_TotalRisk<$commodityTotalRisk?($optionsCap-$optionsTotalRisk) * 0.005:$optionsRisk;
-        $commodityRisk = $commodity_TotalRisk<$commodityTotalRisk?($commodityCap-$commodityTotalRisk) * 0.01:$commodityRisk;
+        $positionalRisk = $positional_TotalRisk<$positionalTotalRisk?($Portfolio-$positionalTotalRisk) * 0.01:$positionalRisk;
+        $swingRisk = $swing_TotalRisk<$swingTotalRisk?($sCap-$swingTotalRisk) * 0.01:$swingRisk;
+        $optionsRisk = $options_TotalRisk<$commodityTotalRisk?($sCap-$optionsTotalRisk) * 0.005:$optionsRisk;
+        $commodityRisk = $commodity_TotalRisk<$commodityTotalRisk?($sCap-$commodityTotalRisk) * 0.01:$commodityRisk;
 
         $InMkt_Positional=$positional_TotalRisk<$positionalTotalRisk?$InMktRiskPositional-$positionalTotalRisk:$InMktRiskPositional;
         $InMkt_Swing=$swing_TotalRisk<$swingTotalRisk?$InMktRiskSwing-$swingTotalRisk:$InMktRiskSwing;
         $turnOver_Options=$options_TotalRisk<$commodityTotalRisk?$turnOverOptions-$optionsTotalRisk:$turnOverOptions;
         $turnOver_Commodity=$commodity_TotalRisk<$commodityTotalRisk?$turnOverCommodity-$commodityTotalRisk:$turnOverCommodity;
 
-        $riskPossibleSwing = $swing_TotalRisk - $InMkt_Swing + $turnoverSwing;
         $riskPossiblePositional = $positional_TotalRisk - $InMkt_Positional + $turnoverPositional;
-        $riskPossibleOptions = $options_TotalRisk+$turnOver_Options;
-        $riskPossibleCommodity = $commodity_TotalRisk+$turnOver_Commodity;
+        $riskPossibleSwing = $swing_TotalRisk - $InMkt_Swing + $turnoverSwing + $turnOver_Options + $turnOver_Commodity ;
+        $riskPossibleOptions = $options_TotalRisk- $InMkt_Swing + $turnoverSwing + $turnOver_Options + $turnOver_Commodity ;
+        $riskPossibleCommodity = $commodity_TotalRisk- $InMkt_Swing + $turnoverSwing + $turnOver_Options + $turnOver_Commodity ;
 
-        $tradePossibleSwing = $riskPossibleSwing / $swingRisk;
         $tradePossiblePositional = $riskPossiblePositional / $positionalRisk;
+        $tradePossibleSwing = $riskPossibleSwing / $swingRisk;
         $tradePossibleOptions = $riskPossibleOptions / $optionsRisk;
         $tradePossibleCommodity = $riskPossibleCommodity / $commodityRisk;
 
@@ -237,7 +255,7 @@ class HomeController extends Controller
             'tradePossiblePositional' => round($tradePossiblePositional, 2),
             'equityExpense' => $equityExpense,
             // Swing
-            'swingCap' => $swingCap,
+            'swingCap' => $sCap,
             'swingRisk' => $swingRisk,
             'InMktRiskSwing' => $InMktRiskSwing,
             'turnoverSwing' => $turnoverSwing,
@@ -245,7 +263,7 @@ class HomeController extends Controller
             'riskPossibleSwing' => $riskPossibleSwing,
             'tradePossibleSwing' => round($tradePossibleSwing, 2),
             // Options
-            'optionsCap' => $optionsCap,
+            'optionsCap' => $sCap,
             'optionsRisk' => $optionsRisk,
             'turnOverOptions' => $turnOverOptions,
             'optionsTotalRisk' => $options_TotalRisk,
@@ -253,7 +271,7 @@ class HomeController extends Controller
             'tradePossibleOptions' => round($tradePossibleOptions, 2),
             'optionsExpense' => $optionsExpense,
             // Commodity
-            'commodityCap' => $commodityCap,
+            'commodityCap' => $sCap,
             'commodityRisk' => $commodityRisk,
             'turnOverCommodity' => $turnOverCommodity,
             'commodityTotalRisk' => $commodity_TotalRisk,
@@ -261,15 +279,21 @@ class HomeController extends Controller
             'tradePossibleCommodity' => round($tradePossibleCommodity, 2),
             'commodityExpense' => $commodityExpense,
             // Period
-            'StartDate' => $StartDate, 'EndDate' => $EndDate
+            'StartDate' => $StartDate, 'EndDate' => $EndDate, 'UserID' => $User
             
         ]);
     }
     function openTrade(Request $req)
     {
-        $data = TradeJournal::where('Order', 'Open')
-            ->orWhere('Order', 'In Process')
-            ->get();
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+
+        $data = TradeJournal::where(function($query) use ($User) {
+                    $query->where('Order', 'Open')
+                          ->orWhere('Order', 'In Process');
+                })
+                ->where('UserID', $User)
+                ->get();
         return view('home.open-trade', ['trade' => $data->toArray()]);
     }
     function viewTrade(Request $req, $TradeID)
@@ -282,6 +306,14 @@ class HomeController extends Controller
         } else {
             return redirect('open-trade');
         }
+    }
+    function addEntryFetch(Request $req){
+        $User=$req->session()->get('user')['UserID'];
+
+        $data = Profile::where('ManagerID', $User)
+                ->get();
+
+        return view('home.add-entry', ['user' => $data->toArray(), 'manager' => $User]);
     }
     function addEntry(Request $req)
     {
@@ -298,7 +330,7 @@ class HomeController extends Controller
             // $tb->SchemeID = '23EGD8564';
             $tb->Instrument = $req->Type;
             $tb->Trade = $req->Trade;
-            // $tb->Order =  $req->Order;
+            $tb->Order =  $req->Order;
             // $Date = $req->Date;
             // $tb->Chart = $req->Chart;
             $tb->Script = strtoupper($req->Script);
@@ -365,6 +397,7 @@ class HomeController extends Controller
 
             $req->session()->put('alert', 'Successfully Recorded Dividend');
         } elseif ($req->Trade == 'Intraday' && ($req->Order == 'Buy' || $req->Order == 'Short')) {
+            $User = $req->UserID;
             $Trade =  $req->Trade;
             $Type = $req->Type;
             $Order =  $req->Order;
@@ -419,8 +452,7 @@ class HomeController extends Controller
                 $file->move(public_path('images'), $fileName);
                 $entry = new TradeJournal;
 
-                $entry->UserID = $req->session()->get('user')['UserID'];
-                // $entry->SchemeID = '23TRA7546';
+                $entry->UserID = $User;
                 $entry->TradeID = $TradeID;
                 $entry->Trade = $Trade;
                 $entry->Instrument = $Type;
@@ -577,11 +609,15 @@ class HomeController extends Controller
     }
     function modifyEntryFetch(Request $req, $stage, $Order, $TradeID)
     {
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+
         // TradeID NULL mean Upgrade, not NULL mean Edited
         if ($Order == 'In Process' && $stage == "Upgrade") {
 
             $data = TradeJournal::where('Script', $TradeID)
                 ->where('Order', $Order)
+                ->where('UserID', $User)
                 ->first();
 
             $Entry = $data->Entry;
@@ -591,17 +627,19 @@ class HomeController extends Controller
 
             $data = TradeJournal::where('TradeID', $TradeID)
                 ->where('Order', $Order)
+                ->where('UserID', $User)
                 ->first();
 
             $Script = $data->Script;
             $Trade = $data->Trade;
 
             $avgEntry = TradeJournal::selectRaw('SUM(Stop_Loss * Quantity)/SUM(Quantity) as avg_sl, SUM(Entry*Quantity)/SUM(Quantity) as avg_entry')
-                ->whereIn('TradeID', function ($query) use ($Script, $Trade, $Order) {
+                ->whereIn('TradeID', function ($query) use ($Script, $Trade, $Order, $User) {
                     $query->select('TradeID')
                         ->from((new TradeJournal)->getTable())
                         ->where('Script', $Script)
                         ->where('Order', $Order)
+                        ->where('UserID', $User)
                         ->where('Trade', $Trade);
                 })
                 ->first();
@@ -612,6 +650,7 @@ class HomeController extends Controller
 
             $data = TradeJournal::where('TradeID', $TradeID)
                 ->where('Order', $Order)
+                ->where('UserID', $User)
                 ->first();
 
             $Entry = $data->Entry;
@@ -621,6 +660,7 @@ class HomeController extends Controller
 
             $data = TradeJournal::where('TradeID', $TradeID)
                 ->where('Order', $Order)
+                ->where('UserID', $User)
                 ->first();
 
             $Entry = $data->Entry;
@@ -629,6 +669,7 @@ class HomeController extends Controller
         } else {
             $data = TradeJournal::where('TradeID', $TradeID)
                 ->where('Order', $Order)
+                ->where('UserID', $User)
                 ->first();
 
             $Entry = $data->Entry;
@@ -639,6 +680,9 @@ class HomeController extends Controller
     }
     function modifyEntry(Request $req)
     {
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+
         if ($req->Order == 'Open' && $req->TradeID == "NULL") {
 
             $Trade =  strtoupper($req->Trade);
@@ -680,6 +724,7 @@ class HomeController extends Controller
 
                 $entry = TradeJournal::where('Script', $req->Script)
                     ->where('Order', 'In Process')
+                    ->where('UserID', $User)
                     ->update([
                         'TradeID' => $TradeID,
                         'Order' => $Order,
@@ -885,7 +930,7 @@ class HomeController extends Controller
                 $file->move(public_path('images'), $fileName);
                 $entry = new TradeJournal;
 
-                $entry->UserID = $req->session()->get('user')['UserID'];
+                $entry->UserID = $User;
                 // $entry->SchemeID = $SchemeID;
                 $entry->TradeID = $TradeID;
                 $entry->Trade = $Trade;
@@ -922,7 +967,7 @@ class HomeController extends Controller
 
                 $summary = new TradeSummary;
 
-                $summary->UserID = $req->session()->get('user')['UserID'];
+                $summary->UserID = $User;
                 // $summary->SchemeID = $SchemeID;
                 $summary->TradeID = $TradeID;
                 $summary->Trade = $Trade;
@@ -946,7 +991,7 @@ class HomeController extends Controller
 
                 $expense = new Expense;
 
-                $expense->UserID = $req->session()->get('user')['UserID'];
+                $expense->UserID = $User;
                 // $expense->SchemeID = $SchemeID;
                 $expense->ExpenseID = $ExpenseID;
                 $expense->TradeID = $TradeID;
@@ -999,6 +1044,7 @@ class HomeController extends Controller
 
                 $entry = TradeJournal::where('Script', $Script)
                     ->where('TradeID', $req->TradeID)
+                    ->where('UserID', $User)
                     ->update([
                         // 'TradeID' => $TradeID,
                         // 'Order' => $Order,
@@ -1062,6 +1108,7 @@ class HomeController extends Controller
                 $file->move(public_path('images'), $fileName);
 
                 $entry = TradeJournal::where('TradeID', $req->TradeID)
+                    ->where('UserID', $User)
                     ->update([
                         // 'TradeID' => $TradeID_prev,
                         'Order' => $Order,
@@ -1153,6 +1200,7 @@ class HomeController extends Controller
 
                 $entry = TradeJournal::where('Script', $Script)
                     ->where('TradeID', $req->TradeID)
+                    ->where('UserID', $User)
                     ->update([
                         // 'TradeID' => $TradeID,
                         // 'Order' => $Order,
@@ -1204,8 +1252,12 @@ class HomeController extends Controller
     }
     function isClosed(Request $req, $TradeID)
     {
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+
         $Last_Modified=date("Y-m-d");
         $entry = TradeJournal::where('TradeID', $TradeID)
+            ->where('UserID', $User)
             ->update([
                 'Order' => 'Entry',
                 'Last_Modified'=>$Last_Modified
@@ -1224,7 +1276,12 @@ class HomeController extends Controller
         $StartDate = (!empty($req->StartDate)) ? $req->StartDate : $LatestQuarterDate; // quarter
         $EndDate = (!empty($req->EndDate)) ? $req->EndDate : date('Y-m-d'); // today
 
-        $data = TradeJournal::whereBetween('Date', [$StartDate, $EndDate])->get();
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+
+        $data = TradeJournal::whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
+            ->get();
 
         // $trade = $data->toArray();
         // $trade_collect = collect($trade);
@@ -1241,14 +1298,21 @@ class HomeController extends Controller
         $StartDate = (!empty($req->StartDate)) ? $req->StartDate : $LatestQuarterDate; // quarter
         $EndDate = (!empty($req->EndDate)) ? $req->EndDate : date('Y-m-d'); // today
 
-        $data = Expense::whereBetween('Date', [$StartDate, $EndDate])->get();
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+
+        $data = Expense::whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
+            ->get();
 
         $trade = $data->toArray();
         $trade_collect = collect($trade);
 
         $ExpAmount = $trade_collect->sum('Amount');
 
-        $data = TradeSummary::whereBetween('Date', [$StartDate, $EndDate])->get();
+        $data = TradeSummary::whereBetween('Date', [$StartDate, $EndDate])
+            ->where('UserID', $User)
+            ->get();
 
         $trade = $data->toArray();
         $trade_collect = collect($trade);
@@ -1260,21 +1324,28 @@ class HomeController extends Controller
     }
     function deleteEntry(Request $req, $TradeID, $Order)
     {
+        // $User=(!empty($req->UserID)) ? $req->session()->get('user')['UserID'] : $req->UserID;
+        $User=$req->session()->get('user')['UserID'];
+        
         if ($Order == 'In Process') {
             $delete = TradeJournal::where('Script', $TradeID)
                 ->where('Order', 'In Process')
+                ->where('UserID', $User)
                 ->delete();
             $req->session()->put('alert', 'Successfully Deleted Record');
             return redirect('open-trade');
         } elseif ($Order == "DEL-J") {
             $delete = TradeJournal::where('TradeID', $TradeID)
+                ->where('UserID', $User)
                 ->delete();
         } elseif ($Order == "DEL-S") {
             $delete = TradeSummary::where('TradeID', $TradeID)
+                ->where('UserID', $User)
                 ->delete();
         }
         elseif ($Order == "DEL-E") {
             $delete = Expense::where('TradeID', $TradeID)
+                ->where('UserID', $User)
                 ->delete();
         }
         return redirect('open-trade');

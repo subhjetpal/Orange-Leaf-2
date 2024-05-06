@@ -8,7 +8,7 @@ include('sheetsFunc.php');
 $today = date('Y-m-d');
 $yesterday = date('Y-m-d', strtotime('-1 day'));
 // $sql = "SELECT * FROM $tb_journal_nse WHERE `Date` between '$StartDate' and '$EndDate' ";
-$sql = "SELECT * FROM $tb_journal_nse WHERE `Last_Modified` = '$yesterday' ";
+$sql = "SELECT * FROM $tb_journal WHERE `Last_Modified` = '$yesterday' ";
 
 $res = mysqli_query($con, $sql);
 $record = array();

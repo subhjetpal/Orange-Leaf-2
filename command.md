@@ -56,7 +56,7 @@ composer update
 Or run only
 composer require requirement_file
 
-composer remove reliese/laravel
+composer remove requirement_file
 
 # Seeder 
 

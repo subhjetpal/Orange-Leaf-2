@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\FuncController;
+use App\Http\Controllers\GoogAPIController;
 use Illuminate\Support\Facades\Session;
 
 
@@ -51,9 +51,7 @@ Route::get('/performance', function () {
     return view('home.performance');
 });
 
-Route::get('/add-entry', function () {
-    return view('home.add-entry');
-});
+Route::get('/add-entry', [HomeController::class, 'addEntryFetch']);
 
 Route::post('/add-entry', [HomeController::class, 'addEntry']);
 
@@ -107,5 +105,9 @@ Route::post('/add-comment', [HomeController::class, 'addComment']);
 // Functionality
 
 Route::get('/check-script', 'UserController@checkEmailAvailability')->name('check.email');
+
+Route::get('/{api}/journal', [GoogAPIController::class, 'journal']);
+Route::get('/{api}/summary', [GoogAPIController::class, 'summary']);
+Route::get('/{api}/in-process', [GoogAPIController::class, 'inProcess']);
 
 

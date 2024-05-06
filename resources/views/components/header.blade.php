@@ -9,7 +9,6 @@
         <ul>
           <li><a class="getstarted scrollto" href="login">Login</a></li>
           <li><a class="getstarted scrollto" href="calculator">Calculator</a></li>
-          <li><a class="getstarted scrollto" href="emi-calculator">EMI Calculator</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->

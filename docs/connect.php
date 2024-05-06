@@ -1,8 +1,8 @@
 <?php 
 // $appLoc='/Orangeleaf/App';
 // require $_SERVER['DOCUMENT_ROOT'].$appLoc.'/sheets/vendor/autoload.php';
-require 'C:\xampp\htdocs\orange-leaf\vendor\autoload.php';
-// require('/var/www/vhosts/doyat.in/orange-leaf.doyat.in//vendor/autoload.php'); 
+// require 'C:\xampp\htdocs\orange-leaf\vendor\autoload.php';
+require('/var/www/vhosts/doyat.in/orange-leaf.doyat.in//vendor/autoload.php'); 
 
 // configure the Google Client
 $client = new \Google_Client();

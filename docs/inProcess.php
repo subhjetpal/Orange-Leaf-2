@@ -5,7 +5,7 @@ include('docsFunc.php');
 // fetch In Process Orders and follow the structure as Doc
 $today = date('Y-m-d');
 $yesterday = date('Y-m-d', strtotime('-1 day'));
-$sql = "SELECT * FROM $tb_journal WHERE `Last_Modified` = '$yesterday' and  `Order` = 'In Process'";
+$sql = "SELECT * FROM $tb_journal WHERE `Last_Modified` = '$yesterday' and  `Order` = 'In Process' ";
 
 $res = mysqli_query($con, $sql);
 $record = array();
@@ -22,7 +22,7 @@ if ($res) {
             $batch = array_slice($record, $i, $batchSize);
         foreach ($batch as $val) {
             // $text=$yesterday.'\n\nP:'.$val['Script'].'\nE:'.$val['Entry'].'\nSL:'.$val['Stop_Loss'].'\nQ:'. $val['Username']-$val['$Quantity'];
-            $text="\n\n".$val['UserID'] ."\nS: ".$val['Script']."\nE: ".$val['Entry']."\nSL:".$val['Stop_Loss']."\nQ:".$val['$Quantity'];
+            $text="\n\n".$val['UserID'] ."\nS: ".$val['Script']."\nE: ".$val['Entry']."\nSL:".$val['Stop_Loss']."\nQ:".$val['Quantity']."\n";
             
             $res = inProcess($text);
             
@@ -37,7 +37,7 @@ if ($res) {
             sleep($delaySeconds);
         }
     }
-    $text=$today."\n\n\n";
+    $text=$today."\n";
     inProcess($text);
     }else{
         $txt=$today.' IN-PROCESS NO RECORD to MODIFY ';

@@ -24,7 +24,7 @@
                                 @csrf
                                 <div class="col-12">
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label for="Trade" class="form-label">Trade *</label>
                                             <select name="Trade" class="form-select" id="Trade" required>
                                                 <option value="" default>Select</option>
@@ -34,7 +34,25 @@
                                                 <option value="Dividend">Dividend</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
+                                            <label for="MangerID" class="form-label">Manger</label>
+                                            <select name="MangerID" class="form-select" id="MangerID">
+                                                <option value="{{ $manager }}" default>{{ $manager }}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="UserID" class="form-label">User</label>
+                                            <select name="UserID" class="form-select" id="UserID">
+                                                @foreach ($user as $val)
+                                                    <option value="{{ $val['UserID'] }}" id="{{ $val['User_Type'] }}">{{ $val['Username'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-md-4">
                                             <label for="Type" class="form-label">Instrument Type *</label>
                                             <select name="Type" class="form-select" id="Type" required>
                                                 <option value="" default>Select</option>
@@ -44,7 +62,7 @@
                                                 <option value="Futures" disabled>Futures</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label for="Order" class="form-label">Order *</label>
                                             <select name="Order" class="form-select" id="Order" required>
                                                 <option value="" default>Select</option>
@@ -55,7 +73,7 @@
                                                 <option value="Exit" id="Exit_O">Exit</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label for="Date" class="form-label">Date</label>
                                             <input type="date" name="Date" value="" class="form-control"
                                                 id="Date">
@@ -195,6 +213,60 @@
         @endif
         // calculate Candle % on Entry and Stoploss value entry
         $(function() {
+            $("#Trade").change(function() {
+                var Trade = $(this).val();
+                if (Trade == 'Positional') {
+                    $("#In_Process").prop('disabled', false);
+                    $("#Order").prop('disabled', false);
+                    $("#System").prop('disabled', false);
+                    $("#Entry").prop('readonly', false);
+                    $("#Chart").prop('disabled', false);
+                    $("#Stop_Loss").prop('readonly', false);
+                    $("#Target1_2").prop('readonly', true);
+                    $("#Target1_3").prop('readonly', true);
+                    $("#Risk").prop('disabled', false);
+                    $("#fileToUpload").prop('disabled', true);
+                    $("#Investor").prop('disabled', false);
+                } else if (Trade == 'Dividend') {
+                    $("#Order").prop('disabled', true);
+                    $("#Type").prop('disabled', false);
+                    $("#System").prop('disabled', true);
+                    $("#Entry").prop('readonly', true);
+                    $("#Chart").prop('disabled', true);
+                    $("#Stop_Loss").prop('readonly', true);
+                    $("#Target1_2").prop('readonly', true);
+                    $("#Target1_3").prop('readonly', true);
+                    $("#Risk").prop('disabled', true);
+                    $("#fileToUpload").prop('disabled', true);
+                    $("#Investor").prop('disabled', false);
+                } else if (Trade == 'Intraday') {
+                    $("#fileToUpload").prop('disabled', false);
+                    $("#In_Process").prop('disabled', true);
+                    $("#Exit").prop('disabled', false);
+                    $("#Exit_O").prop('disabled', true);
+                    $("#UserID").prop('disabled', false);
+                    $("#ManagerID").prop('disabled', false);
+                    $("#Speculator").prop('disabled', false);
+                } else {
+                    $("#In_Process").prop('disabled', false);
+                    $("#Order").prop('disabled', false);
+                    $("#Type").prop('disabled', false);
+                    $("#System").prop('disabled', false);
+                    $("#Entry").prop('readonly', false);
+                    $("#Chart").prop('disabled', false);
+                    $("#Stop_Loss").prop('readonly', false);
+                    $("#Target1_2").prop('readonly', false);
+                    $("#Target1_3").prop('readonly', false);
+                    $("#Risk").prop('disabled', false);
+                    $("#In_Process").prop('disabled', false);
+                    $("#Exit").prop('disabled', true);
+                    $("#fileToUpload").prop('disabled', true);
+                    $("#UserID").prop('disabled', true);
+                    $("#ManagerID").prop('disabled', true);
+                    $("#Speculator").prop('disabled', true);// dynamic
+                    $("#Investor").prop('disabled', true); // dynamic
+                }
+            });
             var Percent = 0.00;
             $(".candle").change(function() {
                 var Entry = $("#Entry").val();
@@ -223,7 +295,6 @@
                 if (Order == 'In Process') {
                     $("#Date").prop('disabled', true);
                     $("#Chart").prop('disabled', true);
-                    $("#Order").prop('disabled', true);
                     $("#System").prop('disabled', true);
                     $("#fileToUpload").prop('disabled', true);
                     $("#Exit").prop('disabled', true);
@@ -234,54 +305,8 @@
                 } else {
                     $("#Date").prop('disabled', false);
                     $("#Chart").prop('disabled', false);
-                    $("#Order").prop('disabled', false);
                     $("#System").prop('disabled', false);
                     $("#Exit").prop('disabled', false);
-                }
-            });
-            $("#Trade").change(function() {
-                var Trade = $(this).val();
-                if (Trade == 'Positional') {
-                    $("#In_Process").prop('disabled', false);
-                    $("#Order").prop('disabled', false);
-                    $("#System").prop('disabled', false);
-                    $("#Entry").prop('readonly', false);
-                    $("#Chart").prop('disabled', false);
-                    $("#Stop_Loss").prop('readonly', false);
-                    $("#Target1_2").prop('readonly', true);
-                    $("#Target1_3").prop('readonly', true);
-                    $("#Risk").prop('disabled', false);
-                    $("#fileToUpload").prop('disabled', true);
-                } else if (Trade == 'Dividend') {
-                    $("#Order").prop('disabled', true);
-                    $("#Type").prop('disabled', false);
-                    $("#System").prop('disabled', true);
-                    $("#Entry").prop('readonly', true);
-                    $("#Chart").prop('disabled', true);
-                    $("#Stop_Loss").prop('readonly', true);
-                    $("#Target1_2").prop('readonly', true);
-                    $("#Target1_3").prop('readonly', true);
-                    $("#Risk").prop('disabled', true);
-                    $("#fileToUpload").prop('disabled', true);
-                } else if (Trade == 'Intraday') {
-                    $("#fileToUpload").prop('disabled', false);
-                    $("#In_Process").prop('disabled', true);
-                    $("#Exit").prop('disabled', false);
-                    $("#Exit_O").prop('disabled', true);
-                } else {
-                    $("#In_Process").prop('disabled', false);
-                    $("#Order").prop('disabled', false);
-                    $("#Type").prop('disabled', false);
-                    $("#System").prop('disabled', false);
-                    $("#Entry").prop('readonly', false);
-                    $("#Chart").prop('disabled', false);
-                    $("#Stop_Loss").prop('readonly', false);
-                    $("#Target1_2").prop('readonly', false);
-                    $("#Target1_3").prop('readonly', false);
-                    $("#Risk").prop('disabled', false);
-                    $("#In_Process").prop('disabled', false);
-                    $("#Exit").prop('disabled', true);
-                    $("#fileToUpload").prop('disabled', true);
                 }
             });
             $("#Type").change(function() {

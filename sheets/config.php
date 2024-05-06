@@ -13,7 +13,7 @@
 			echo "Failed to connect Mysql:" . mysqli_connect_errno();
 		}
 
-		$tb_journal_nse="trade_journal";
+		$tb_journal="trade_journal";
 		$tb_summary="trade_summary";
 		$tb_expense="expense";
 ?>
